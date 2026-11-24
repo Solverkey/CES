@@ -67,7 +67,12 @@ function cuerpoHtml(value: unknown) {
   return ''
 }
 
-function toPost(doc: Doc, category: Category, categoryLabel: string): Post | null {
+function comisionName(value: unknown, nombres: Map<number, string>) {
+  if (typeof value === 'number') return nombres.get(value) || ''
+  return textOf(value)
+}
+
+function toPost(doc: Doc, category: Category, categoryLabel: string, nombres: Map<number, string>): Post | null {
   if (!doc.slug || !doc.title) return null
   const date = (doc.fecha || doc.publishedAt || '').slice(0, 10)
   return {
@@ -82,7 +87,7 @@ function toPost(doc: Doc, category: Category, categoryLabel: string): Post | nul
     lugar: doc.lugar || '',
     fechaTexto: '',
     hora: doc.hora || '',
-    comision: textOf(doc.comision),
+    comision: comisionName(doc.comision, nombres),
     html: cuerpoHtml(doc.cuerpo),
   }
 }
@@ -91,16 +96,22 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
   const payload = await payloadOrNull()
   if (!payload) return localPosts
 
-  const [dictamenes, actividades, noticias] = await Promise.all([
-    payload.find({ collection: 'dictamenes', limit: 500, depth: 1, sort: '-fecha', pagination: false }),
+  const [dictamenes, actividades, noticias, comisiones] = await Promise.all([
+    payload.find({ collection: 'dictamenes', limit: 500, depth: 0, sort: '-fecha', pagination: false }),
     payload.find({ collection: 'actividades', limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
-    payload.find({ collection: 'noticias', limit: 200, depth: 1, sort: '-publishedAt', pagination: false }),
+    payload.find({ collection: 'noticias', limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
+    payload.find({ collection: 'comisiones', limit: 100, depth: 0, pagination: false }),
   ])
 
+  const nombres = new Map<number, string>()
+  for (const doc of comisiones.docs) {
+    if (typeof doc.nombre === 'string') nombres.set(doc.id, doc.nombre)
+  }
+
   const items = [
-    ...dictamenes.docs.map((doc) => toPost(doc, 'dictamenes', 'Dictámenes')),
-    ...actividades.docs.map((doc) => toPost(doc, 'actividades', 'Actividades')),
-    ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Comunicación')),
+    ...dictamenes.docs.map((doc) => toPost(doc, 'dictamenes', 'Dictámenes', nombres)),
+    ...actividades.docs.map((doc) => toPost(doc, 'actividades', 'Actividades', nombres)),
+    ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Comunicación', nombres)),
   ].filter((post): post is Post => Boolean(post))
 
   if (!items.length) return localPosts
@@ -109,16 +120,16 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
 
 const loadPostsPerRequest = cache(loadPostsFromDatabase)
 
-/** Durante el build de Vercel cada ficha pedía la base de datos. Una sola lectura basta. */
-let buildPosts: Promise<Post[]> | undefined
+/** En producción (y en el build) todas las fichas comparten una sola lectura. */
+let postsPromise: Promise<Post[]> | undefined
 
 export function loadPosts(): Promise<Post[]> {
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
-    buildPosts ??= loadPostsFromDatabase().catch((error) => {
-      buildPosts = undefined
+  if (process.env.NODE_ENV === 'production') {
+    postsPromise ??= loadPostsFromDatabase().catch((error) => {
+      postsPromise = undefined
       throw error
     })
-    return buildPosts
+    return postsPromise
   }
   return loadPostsPerRequest()
 }

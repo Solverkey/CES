@@ -50,8 +50,8 @@ export default buildConfig({
     disableCreateDatabase: true,
     pool: {
       connectionString,
-      // El pooler en modo sesión admite 15 clientes. En Vercel varios procesos generan páginas a la vez.
-      ...(process.env.VERCEL ? { max: 1 } : {}),
+      // El pooler en modo sesión admite 15 clientes. Hay 3 procesos generando páginas.
+      ...(process.env.VERCEL ? { max: 3 } : {}),
       // Supabase exige SSL. El certificado del pooler no siempre encaja con la cadena por defecto de Node.
       ...(usesSupabase ? { ssl: { rejectUnauthorized: false } } : {}),
     },
