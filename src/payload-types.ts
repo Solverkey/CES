@@ -300,6 +300,8 @@ export interface Actividade {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Las fotos que se pueden elegir en actividades y comunicación.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "imagenes".
  */

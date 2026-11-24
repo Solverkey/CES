@@ -51,7 +51,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const post = loaded.find((item) => item.slug === slug) || findPost(slug)
   if (!post) notFound()
 
-  const siblings = posts.filter((item) => item.category === post.category)
+  const siblings = loaded.filter((item) => item.category === post.category)
   const index = siblings.findIndex((item) => item.slug === post.slug)
   const newer = index > 0 ? siblings[index - 1] : undefined
   const older = index >= 0 ? siblings[index + 1] : undefined

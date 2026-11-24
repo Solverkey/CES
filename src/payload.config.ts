@@ -20,7 +20,9 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const SITE_NAME = 'CES La Rioja'
-const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+const configuredUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
+// En local la dirección lleva un puerto fijo y las fotos no cargan si el panel usa otro.
+const serverUrl = /localhost|127\.0\.0\.1/.test(configuredUrl) ? '' : configuredUrl
 const connectionString = process.env.DATABASE_URL || ''
 const usesSupabase = /supabase\.(co|com)/.test(connectionString)
 
