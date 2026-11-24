@@ -24,8 +24,12 @@ const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const connectionString = process.env.DATABASE_URL || ''
 const usesSupabase = /supabase\.(co|com)/.test(connectionString)
 
+const localOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001']
+
 export default buildConfig({
   serverURL: serverUrl,
+  // La cookie de sesión se rechaza si el origen no está en esta lista. El panel local usa el 3001.
+  csrf: [...new Set([serverUrl, ...localOrigins].filter(Boolean))],
   admin: {
     user: Users.slug,
     meta: { titleSuffix: ` · ${SITE_NAME}` },

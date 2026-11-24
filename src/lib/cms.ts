@@ -16,6 +16,7 @@ type Doc = {
   slug?: string | null
   title?: string | null
   fecha?: string | null
+  fechaActo?: string | null
   publishedAt?: string | null
   resumen?: string | null
   extracto?: string | null
@@ -52,9 +53,20 @@ function textOf(value: unknown) {
   return ''
 }
 
+/** Las fotos subidas se guardan con el puerto del .env. En local se sirve la ruta, en el puerto que esté abierto. */
+function ownFile(url: string) {
+  try {
+    const parsed = new URL(url)
+    if (parsed.pathname.startsWith('/api/')) return `${parsed.pathname}${parsed.search}`
+  } catch {
+    return url
+  }
+  return url
+}
+
 function fileUrl(value: unknown) {
-  if (typeof value === 'string') return value
-  if (value && typeof value === 'object' && 'url' in value && typeof value.url === 'string') return value.url
+  if (typeof value === 'string') return ownFile(value)
+  if (value && typeof value === 'object' && 'url' in value && typeof value.url === 'string') return ownFile(value.url)
   return ''
 }
 
@@ -84,7 +96,7 @@ function toPost(
   fotos: Map<number, string>,
 ): Post | null {
   if (!doc.slug || !doc.title) return null
-  const date = (doc.fecha || doc.publishedAt || '').slice(0, 10)
+  const date = (doc.fecha || doc.fechaActo || doc.publishedAt || '').slice(0, 10)
   const subida = relationId(doc.imagen)
   return {
     slug: doc.slug,
@@ -134,7 +146,7 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
       pagination: false,
     })
     for (const doc of imagenes.docs) {
-      if (typeof doc.url === 'string') fotos.set(doc.id, doc.url)
+      if (typeof doc.url === 'string') fotos.set(doc.id, ownFile(doc.url))
     }
   }
 
