@@ -1,5 +1,6 @@
 import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
 import { getPayload } from 'payload'
+import { cache } from 'react'
 
 import config from '@payload-config'
 
@@ -86,7 +87,7 @@ function toPost(doc: Doc, category: Category, categoryLabel: string): Post | nul
   }
 }
 
-export async function loadPosts(): Promise<Post[]> {
+async function loadPostsFromDatabase(): Promise<Post[]> {
   const payload = await payloadOrNull()
   if (!payload) return localPosts
 
@@ -104,6 +105,22 @@ export async function loadPosts(): Promise<Post[]> {
 
   if (!items.length) return localPosts
   return items.sort((a, b) => b.date.localeCompare(a.date))
+}
+
+const loadPostsPerRequest = cache(loadPostsFromDatabase)
+
+/** Durante el build de Vercel cada ficha pedía la base de datos. Una sola lectura basta. */
+let buildPosts: Promise<Post[]> | undefined
+
+export function loadPosts(): Promise<Post[]> {
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    buildPosts ??= loadPostsFromDatabase().catch((error) => {
+      buildPosts = undefined
+      throw error
+    })
+    return buildPosts
+  }
+  return loadPostsPerRequest()
 }
 
 export async function loadPost(slug: string) {
