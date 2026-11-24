@@ -65,13 +65,6 @@ export const Dictamenes: CollectionConfig = {
       ],
     },
     {
-      name: 'pdf',
-      label: 'Dictamen en PDF',
-      type: 'upload',
-      relationTo: 'documentos',
-      admin: { description: 'Texto completo firmado. Es lo que se descarga desde la ficha.' },
-    },
-    {
       name: 'resumen',
       label: 'Resumen (opcional)',
       type: 'textarea',
@@ -79,7 +72,12 @@ export const Dictamenes: CollectionConfig = {
     },
     { name: 'contenido', label: 'Contenido adicional (opcional)', type: 'richText' },
     { name: 'cuerpo', label: 'Texto de la ficha', type: 'textarea' },
-    { name: 'archivoUrl', label: 'Enlace al PDF', type: 'text' },
+    {
+      name: 'archivoUrl',
+      label: 'Enlace al PDF',
+      type: 'text',
+      admin: { description: 'Dirección del PDF firmado. Es lo que se abre desde la ficha.' },
+    },
     {
       name: 'publishedAt',
       label: 'Fecha de publicación en la web',

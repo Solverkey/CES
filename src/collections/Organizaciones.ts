@@ -37,7 +37,6 @@ export const Organizaciones: CollectionConfig = {
       ],
     },
     { name: 'web', label: 'Web', type: 'text' },
-    { name: 'logo', label: 'Logo', type: 'upload', relationTo: 'media' },
     { name: 'orden', label: 'Orden', type: 'number', defaultValue: 0, admin: { position: 'sidebar' } },
   ],
 }

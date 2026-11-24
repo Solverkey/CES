@@ -18,7 +18,7 @@ export function SearchBar({
         <option value="0">Todas las categorías</option>
         <option value="actividades">Actividades</option>
         <option value="dictamenes">Dictámenes</option>
-        <option value="noticias">Notas de prensa</option>
+        <option value="noticias">Comunicación</option>
       </select>
       <button type="submit">Realizar busqueda</button>
     </form>

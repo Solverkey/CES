@@ -19,6 +19,7 @@ type Doc = {
   extracto?: string | null
   cuerpo?: string | null
   archivoUrl?: string | null
+  imagenUrl?: string | null
   lugar?: string | null
   hora?: string | null
   fechaTexto?: string | null
@@ -57,7 +58,7 @@ function toPost(doc: Doc, category: Category, categoryLabel: string): Post | nul
     category,
     categoryLabel,
     excerpt: doc.extracto || doc.resumen || '',
-    image: null,
+    image: doc.imagenUrl || null,
     pdf: doc.archivoUrl || null,
     lugar: doc.lugar || '',
     fechaTexto: '',
@@ -80,7 +81,7 @@ export async function loadPosts(): Promise<Post[]> {
   const items = [
     ...dictamenes.docs.map((doc) => toPost(doc, 'dictamenes', 'Dictámenes')),
     ...actividades.docs.map((doc) => toPost(doc, 'actividades', 'Actividades')),
-    ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Notas de prensa')),
+    ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Comunicación')),
   ].filter((post): post is Post => Boolean(post))
 
   if (!items.length) return localPosts
@@ -93,21 +94,5 @@ export async function loadPost(slug: string) {
 }
 
 export async function loadPage(slug: string): Promise<PageContent | undefined> {
-  const local = localPages[slug]
-  const payload = await payloadOrNull()
-  if (!payload) return local
-
-  const { docs } = await payload.find({
-    collection: 'paginas',
-    where: { slug: { equals: slug } },
-    limit: 1,
-    depth: 0,
-  })
-  const doc = docs[0] as { title?: string | null; cuerpo?: string | null } | undefined
-  if (!doc?.cuerpo) return local
-  return {
-    title: doc.title || local?.title || slug,
-    html: doc.cuerpo,
-    links: local?.links,
-  }
+  return localPages[slug]
 }

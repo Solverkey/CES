@@ -87,7 +87,7 @@ export const UltimasPublicacionesBlock: Block = {
       options: [
         { label: 'Dictámenes', value: 'dictamenes' },
         { label: 'Actividades', value: 'actividades' },
-        { label: 'Notas de prensa', value: 'noticias' },
+        { label: 'Comunicación', value: 'noticias' },
       ],
     },
     { name: 'cantidad', label: 'Cantidad', type: 'number', defaultValue: 6, min: 1, max: 24 },

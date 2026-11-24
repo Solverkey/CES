@@ -22,7 +22,6 @@ export const Comisiones: CollectionConfig = {
       admin: { description: 'Variantes usadas en WordPress. El script de migración las usa para asignar cada dictamen.' },
       fields: [{ name: 'texto', type: 'text', required: true }],
     },
-    { name: 'foto', label: 'Foto de la comisión', type: 'upload', relationTo: 'media' },
     { name: 'orden', label: 'Orden', type: 'number', defaultValue: 0, admin: { position: 'sidebar' } },
   ],
 }

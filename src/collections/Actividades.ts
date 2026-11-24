@@ -66,7 +66,7 @@ export const Actividades: CollectionConfig = {
         },
       ],
     },
-    { name: 'imagen', label: 'Imagen destacada', type: 'upload', relationTo: 'media' },
+    { name: 'imagenUrl', label: 'URL de la imagen', type: 'text' },
     {
       name: 'extracto',
       label: 'Extracto',

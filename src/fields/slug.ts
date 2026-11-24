@@ -4,7 +4,7 @@ import type { CollectionSlug, Field, FieldHook, TextFieldSingleValidation } from
  * Colecciones que comparten la raíz del sitio (ceslarioja.org/<slug>/).
  * Un slug no puede repetirse entre ellas, porque /[slug] tiene que resolver a un único documento.
  */
-export const ROOT_COLLECTIONS = ['paginas', 'dictamenes', 'actividades', 'noticias'] as const satisfies CollectionSlug[]
+export const ROOT_COLLECTIONS = ['dictamenes', 'actividades', 'noticias'] as const satisfies CollectionSlug[]
 
 export const slugify = (value: string): string =>
   value

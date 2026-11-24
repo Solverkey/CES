@@ -1,6 +1,5 @@
 import type { Payload } from 'payload'
 
-import pagesJson from '../content/pages.json'
 import postsJson from '../content/posts.json'
 
 type StoredPost = {
@@ -10,13 +9,13 @@ type StoredPost = {
   category: string
   excerpt: string
   pdf: string | null
+  image: string | null
   lugar: string
   hora: string
   html: string
 }
 
 const posts = postsJson as StoredPost[]
-const pages = pagesJson as Record<string, { title: string; html: string }>
 
 function dictamenNumbers(title: string, date: string) {
   const match = title.match(/(\d+)\s*\/\s*(\d{4})/)
@@ -71,8 +70,15 @@ export async function importarContenido(payload: Payload) {
     })
     const data =
       collection === 'actividades'
-        ? { ...shared, organo: organo(post.title), lugar: post.lugar || undefined, hora: post.hora || undefined, fechaActo: post.date || undefined }
-        : shared
+        ? {
+            ...shared,
+            organo: organo(post.title),
+            lugar: post.lugar || undefined,
+            hora: post.hora || undefined,
+            fechaActo: post.date || undefined,
+            imagenUrl: post.image || undefined,
+          }
+        : { ...shared, imagenUrl: post.image || undefined }
     if (existing.docs[0]) {
       await payload.update({ collection, id: existing.docs[0].id, data, context })
     } else {
@@ -80,20 +86,5 @@ export async function importarContenido(payload: Payload) {
     }
   }
 
-  for (const [slug, page] of Object.entries(pages)) {
-    const existing = await payload.find({
-      collection: 'paginas',
-      where: { slug: { equals: slug } },
-      limit: 1,
-      depth: 0,
-    })
-    const data = { title: page.title, slug, cuerpo: page.html, _status: 'published' as const }
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'paginas', id: existing.docs[0].id, data, context })
-    } else {
-      await payload.create({ collection: 'paginas', data, context })
-    }
-  }
-
-  payload.logger.info(`Contenido importado: ${posts.length} publicaciones y ${Object.keys(pages).length} páginas.`)
+  payload.logger.info(`Contenido importado: ${posts.length} publicaciones.`)
 }

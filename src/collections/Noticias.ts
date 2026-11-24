@@ -4,10 +4,10 @@ import { authenticated, publishedOrAuthenticated } from '../access'
 import { slugField, wpIdField } from '../fields/slug'
 import { revalidateDelete, revalidateDoc } from '../hooks/revalidate'
 
-/** Notas de prensa (sección «Comunicación»). */
+/** Sección «Comunicación» del menú. */
 export const Noticias: CollectionConfig = {
   slug: 'noticias',
-  labels: { singular: 'Nota de prensa', plural: 'Notas de prensa' },
+  labels: { singular: 'Comunicación', plural: 'Comunicación' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'publishedAt', '_status'],
@@ -23,7 +23,7 @@ export const Noticias: CollectionConfig = {
   versions: { drafts: true },
   fields: [
     { name: 'title', label: 'Título', type: 'text', required: true },
-    { name: 'imagen', label: 'Imagen destacada', type: 'upload', relationTo: 'media' },
+    { name: 'imagenUrl', label: 'URL de la imagen', type: 'text' },
     {
       name: 'extracto',
       label: 'Extracto',

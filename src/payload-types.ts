@@ -67,19 +67,13 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    paginas: Pagina;
     dictamenes: Dictamene;
     actividades: Actividade;
     noticias: Noticia;
     comisiones: Comisione;
-    miembros: Miembro;
     organizaciones: Organizacione;
-    media: Media;
-    documentos: Documento;
     users: User;
     redirects: Redirect;
-    forms: Form;
-    'form-submissions': FormSubmission;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -87,19 +81,13 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    paginas: PaginasSelect<false> | PaginasSelect<true>;
     dictamenes: DictamenesSelect<false> | DictamenesSelect<true>;
     actividades: ActividadesSelect<false> | ActividadesSelect<true>;
     noticias: NoticiasSelect<false> | NoticiasSelect<true>;
     comisiones: ComisionesSelect<false> | ComisionesSelect<true>;
-    miembros: MiembrosSelect<false> | MiembrosSelect<true>;
     organizaciones: OrganizacionesSelect<false> | OrganizacionesSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    documentos: DocumentosSelect<false> | DocumentosSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    forms: FormsSelect<false> | FormsSelect<true>;
-    'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -109,16 +97,8 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {
-    header: Header;
-    footer: Footer;
-    contacto: Contacto;
-  };
-  globalsSelect: {
-    header: HeaderSelect<false> | HeaderSelect<true>;
-    footer: FooterSelect<false> | FooterSelect<true>;
-    contacto: ContactoSelect<false> | ContactoSelect<true>;
-  };
+  globals: {};
+  globalsSelect: {};
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -149,402 +129,6 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "paginas".
- */
-export interface Pagina {
-  id: number;
-  title: string;
-  layout?:
-    | (
-        | {
-            antetitulo?: string | null;
-            titulo: string;
-            texto?: string | null;
-            imagen?: (number | null) | Media;
-            accesos?:
-              | {
-                  etiqueta: string;
-                  /**
-                   * Interna: /dictamenes · Externa: https://…
-                   */
-                  url: string;
-                  nuevaPestana?: boolean | null;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'hero';
-          }
-        | {
-            /**
-             * Sin #. Ej.: saludo → /institucion#saludo
-             */
-            ancla?: string | null;
-            titulo?: string | null;
-            contenido: {
-              root: {
-                type: string;
-                children: {
-                  type: any;
-                  version: number;
-                  [k: string]: unknown;
-                }[];
-                direction: ('ltr' | 'rtl') | null;
-                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                indent: number;
-                version: number;
-              };
-              [k: string]: unknown;
-            };
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'texto';
-          }
-        | {
-            /**
-             * Sin #. Ej.: saludo → /institucion#saludo
-             */
-            ancla?: string | null;
-            titulo?: string | null;
-            items?:
-              | {
-                  titulo: string;
-                  contenido: {
-                    root: {
-                      type: string;
-                      children: {
-                        type: any;
-                        version: number;
-                        [k: string]: unknown;
-                      }[];
-                      direction: ('ltr' | 'rtl') | null;
-                      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                      indent: number;
-                      version: number;
-                    };
-                    [k: string]: unknown;
-                  };
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'acordeon';
-          }
-        | {
-            titulo?: string | null;
-            automatico?: boolean | null;
-            enlaces?:
-              | {
-                  etiqueta: string;
-                  /**
-                   * Interna: /dictamenes · Externa: https://…
-                   */
-                  url: string;
-                  nuevaPestana?: boolean | null;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'indice';
-          }
-        | {
-            titulo?: string | null;
-            tipos?: ('dictamenes' | 'actividades' | 'noticias')[] | null;
-            cantidad?: number | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'ultimasPublicaciones';
-          }
-        | {
-            titulo?: string | null;
-            form: number | Form;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'formulario';
-          }
-        | {
-            titulo?: string | null;
-            mostrarDatos?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'mapa';
-          }
-        | {
-            /**
-             * Sin #. Ej.: saludo → /institucion#saludo
-             */
-            ancla?: string | null;
-            titulo?: string | null;
-            intro?: string | null;
-            enlaces?:
-              | {
-                  etiqueta: string;
-                  /**
-                   * Interna: /dictamenes · Externa: https://…
-                   */
-                  url: string;
-                  nuevaPestana?: boolean | null;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'listaEnlaces';
-          }
-        | {
-            /**
-             * Sin #. Ej.: saludo → /institucion#saludo
-             */
-            ancla?: string | null;
-            titulo?: string | null;
-            modo?: ('miembros' | 'organizaciones') | null;
-            imagen?: (number | null) | Media;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'miembros';
-          }
-        | {
-            /**
-             * Sin #. Ej.: saludo → /institucion#saludo
-             */
-            ancla?: string | null;
-            titulo?: string | null;
-            imagenes?:
-              | {
-                  imagen: number | Media;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'galeria';
-          }
-      )[]
-    | null;
-  /**
-   * Se genera a partir del título. La URL será ceslarioja.org/<slug>/
-   */
-  slug: string;
-  wpId?: number | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  /**
-   * Describe la imagen para lectores de pantalla y buscadores.
-   */
-  alt: string;
-  pie?: string | null;
-  wpUrl?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    card?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    large?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "forms".
- */
-export interface Form {
-  id: number;
-  title: string;
-  fields?:
-    | (
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            required?: boolean | null;
-            defaultValue?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'checkbox';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'email';
-          }
-        | {
-            message?: {
-              root: {
-                type: string;
-                children: {
-                  type: any;
-                  version: number;
-                  [k: string]: unknown;
-                }[];
-                direction: ('ltr' | 'rtl') | null;
-                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                indent: number;
-                version: number;
-              };
-              [k: string]: unknown;
-            } | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'message';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: number | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'number';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: string | null;
-            placeholder?: string | null;
-            options?:
-              | {
-                  label: string;
-                  value: string;
-                  id?: string | null;
-                }[]
-              | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'select';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: string | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'text';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: string | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'textarea';
-          }
-      )[]
-    | null;
-  submitButtonLabel?: string | null;
-  confirmationType?: ('message' | 'redirect') | null;
-  confirmationMessage?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  redirect?: {
-    type?: ('reference' | 'custom') | null;
-    reference?: {
-      relationTo: 'paginas';
-      value: number | Pagina;
-    } | null;
-    url?: string | null;
-  };
-  emails?:
-    | {
-        emailTo?: string | null;
-        cc?: string | null;
-        bcc?: string | null;
-        replyTo?: string | null;
-        emailFrom?: string | null;
-        subject: string;
-        message?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "dictamenes".
  */
 export interface Dictamene {
@@ -566,10 +150,6 @@ export interface Dictamene {
       )
     | null;
   /**
-   * Texto completo firmado. Es lo que se descarga desde la ficha.
-   */
-  pdf?: (number | null) | Documento;
-  /**
    * Si se rellena, aparece en la ficha encima del botón de descarga.
    */
   resumen?: string | null;
@@ -588,6 +168,11 @@ export interface Dictamene {
     };
     [k: string]: unknown;
   } | null;
+  cuerpo?: string | null;
+  /**
+   * Dirección del PDF firmado. Es lo que se abre desde la ficha.
+   */
+  archivoUrl?: string | null;
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
@@ -598,10 +183,6 @@ export interface Dictamene {
   meta?: {
     title?: string | null;
     description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
   };
   updatedAt: string;
   createdAt: string;
@@ -624,30 +205,9 @@ export interface Comisione {
         id?: string | null;
       }[]
     | null;
-  foto?: (number | null) | Media;
   orden?: number | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "documentos".
- */
-export interface Documento {
-  id: number;
-  titulo: string;
-  wpUrl?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -688,7 +248,7 @@ export interface Actividade {
   fechaActo?: string | null;
   hora?: string | null;
   lugar?: string | null;
-  imagen?: (number | null) | Media;
+  imagenUrl?: string | null;
   /**
    * Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.
    */
@@ -708,6 +268,7 @@ export interface Actividade {
     };
     [k: string]: unknown;
   } | null;
+  cuerpo?: string | null;
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
@@ -718,10 +279,6 @@ export interface Actividade {
   meta?: {
     title?: string | null;
     description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
   };
   updatedAt: string;
   createdAt: string;
@@ -734,7 +291,7 @@ export interface Actividade {
 export interface Noticia {
   id: number;
   title: string;
-  imagen?: (number | null) | Media;
+  imagenUrl?: string | null;
   /**
    * Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.
    */
@@ -754,6 +311,7 @@ export interface Noticia {
     };
     [k: string]: unknown;
   } | null;
+  cuerpo?: string | null;
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
@@ -764,34 +322,10 @@ export interface Noticia {
   meta?: {
     title?: string | null;
     description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
   };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "miembros".
- */
-export interface Miembro {
-  id: number;
-  nombre: string;
-  cargo?: ('presidencia' | 'vicepresidencia' | 'secretaria' | 'consejero' | 'suplente') | null;
-  grupo?: ('presidencia' | 'primero' | 'segundo' | 'tercero') | null;
-  organizacion?: (number | null) | Organizacione;
-  email?: string | null;
-  foto?: (number | null) | Media;
-  /**
-   * Desmárcalo en lugar de borrar cuando haya renovación.
-   */
-  activo?: boolean | null;
-  orden?: number | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -804,7 +338,6 @@ export interface Organizacione {
   grupo: 'presidencia' | 'primero' | 'segundo' | 'tercero';
   tipo?: ('sindicato' | 'empresarial' | 'agraria' | 'universidad' | 'gobierno') | null;
   web?: string | null;
-  logo?: (number | null) | Media;
   orden?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -820,10 +353,6 @@ export interface Redirect {
     type?: ('reference' | 'custom') | null;
     reference?:
       | ({
-          relationTo: 'paginas';
-          value: number | Pagina;
-        } | null)
-      | ({
           relationTo: 'dictamenes';
           value: number | Dictamene;
         } | null)
@@ -837,23 +366,6 @@ export interface Redirect {
         } | null);
     url?: string | null;
   };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "form-submissions".
- */
-export interface FormSubmission {
-  id: number;
-  form: number | Form;
-  submissionData?:
-    | {
-        field: string;
-        value: string;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -882,10 +394,6 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'paginas';
-        value: number | Pagina;
-      } | null)
-    | ({
         relationTo: 'dictamenes';
         value: number | Dictamene;
       } | null)
@@ -902,20 +410,8 @@ export interface PayloadLockedDocument {
         value: number | Comisione;
       } | null)
     | ({
-        relationTo: 'miembros';
-        value: number | Miembro;
-      } | null)
-    | ({
         relationTo: 'organizaciones';
         value: number | Organizacione;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'documentos';
-        value: number | Documento;
       } | null)
     | ({
         relationTo: 'users';
@@ -924,14 +420,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
-      } | null)
-    | ({
-        relationTo: 'forms';
-        value: number | Form;
-      } | null)
-    | ({
-        relationTo: 'form-submissions';
-        value: number | FormSubmission;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -977,153 +465,6 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "paginas_select".
- */
-export interface PaginasSelect<T extends boolean = true> {
-  title?: T;
-  layout?:
-    | T
-    | {
-        hero?:
-          | T
-          | {
-              antetitulo?: T;
-              titulo?: T;
-              texto?: T;
-              imagen?: T;
-              accesos?:
-                | T
-                | {
-                    etiqueta?: T;
-                    url?: T;
-                    nuevaPestana?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        texto?:
-          | T
-          | {
-              ancla?: T;
-              titulo?: T;
-              contenido?: T;
-              id?: T;
-              blockName?: T;
-            };
-        acordeon?:
-          | T
-          | {
-              ancla?: T;
-              titulo?: T;
-              items?:
-                | T
-                | {
-                    titulo?: T;
-                    contenido?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        indice?:
-          | T
-          | {
-              titulo?: T;
-              automatico?: T;
-              enlaces?:
-                | T
-                | {
-                    etiqueta?: T;
-                    url?: T;
-                    nuevaPestana?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        ultimasPublicaciones?:
-          | T
-          | {
-              titulo?: T;
-              tipos?: T;
-              cantidad?: T;
-              id?: T;
-              blockName?: T;
-            };
-        formulario?:
-          | T
-          | {
-              titulo?: T;
-              form?: T;
-              id?: T;
-              blockName?: T;
-            };
-        mapa?:
-          | T
-          | {
-              titulo?: T;
-              mostrarDatos?: T;
-              id?: T;
-              blockName?: T;
-            };
-        listaEnlaces?:
-          | T
-          | {
-              ancla?: T;
-              titulo?: T;
-              intro?: T;
-              enlaces?:
-                | T
-                | {
-                    etiqueta?: T;
-                    url?: T;
-                    nuevaPestana?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        miembros?:
-          | T
-          | {
-              ancla?: T;
-              titulo?: T;
-              modo?: T;
-              imagen?: T;
-              id?: T;
-              blockName?: T;
-            };
-        galeria?:
-          | T
-          | {
-              ancla?: T;
-              titulo?: T;
-              imagenes?:
-                | T
-                | {
-                    imagen?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-      };
-  slug?: T;
-  wpId?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "dictamenes_select".
  */
 export interface DictamenesSelect<T extends boolean = true> {
@@ -1133,9 +474,10 @@ export interface DictamenesSelect<T extends boolean = true> {
   fecha?: T;
   comision?: T;
   tipoNorma?: T;
-  pdf?: T;
   resumen?: T;
   contenido?: T;
+  cuerpo?: T;
+  archivoUrl?: T;
   publishedAt?: T;
   autor?: T;
   slug?: T;
@@ -1145,7 +487,6 @@ export interface DictamenesSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
-        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1162,9 +503,10 @@ export interface ActividadesSelect<T extends boolean = true> {
   fechaActo?: T;
   hora?: T;
   lugar?: T;
-  imagen?: T;
+  imagenUrl?: T;
   extracto?: T;
   contenido?: T;
+  cuerpo?: T;
   publishedAt?: T;
   autor?: T;
   slug?: T;
@@ -1174,7 +516,6 @@ export interface ActividadesSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
-        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1186,9 +527,10 @@ export interface ActividadesSelect<T extends boolean = true> {
  */
 export interface NoticiasSelect<T extends boolean = true> {
   title?: T;
-  imagen?: T;
+  imagenUrl?: T;
   extracto?: T;
   contenido?: T;
+  cuerpo?: T;
   publishedAt?: T;
   autor?: T;
   slug?: T;
@@ -1198,7 +540,6 @@ export interface NoticiasSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
-        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1217,23 +558,6 @@ export interface ComisionesSelect<T extends boolean = true> {
         texto?: T;
         id?: T;
       };
-  foto?: T;
-  orden?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "miembros_select".
- */
-export interface MiembrosSelect<T extends boolean = true> {
-  nombre?: T;
-  cargo?: T;
-  grupo?: T;
-  organizacion?: T;
-  email?: T;
-  foto?: T;
-  activo?: T;
   orden?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1248,83 +572,9 @@ export interface OrganizacionesSelect<T extends boolean = true> {
   grupo?: T;
   tipo?: T;
   web?: T;
-  logo?: T;
   orden?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  pie?: T;
-  wpUrl?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        large?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "documentos_select".
- */
-export interface DocumentosSelect<T extends boolean = true> {
-  titulo?: T;
-  wpUrl?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1368,137 +618,6 @@ export interface RedirectsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "forms_select".
- */
-export interface FormsSelect<T extends boolean = true> {
-  title?: T;
-  fields?:
-    | T
-    | {
-        checkbox?:
-          | T
-          | {
-              name?: T;
-              label?: T;
-              width?: T;
-              required?: T;
-              defaultValue?: T;
-              id?: T;
-              blockName?: T;
-            };
-        email?:
-          | T
-          | {
-              name?: T;
-              label?: T;
-              width?: T;
-              required?: T;
-              id?: T;
-              blockName?: T;
-            };
-        message?:
-          | T
-          | {
-              message?: T;
-              id?: T;
-              blockName?: T;
-            };
-        number?:
-          | T
-          | {
-              name?: T;
-              label?: T;
-              width?: T;
-              defaultValue?: T;
-              required?: T;
-              id?: T;
-              blockName?: T;
-            };
-        select?:
-          | T
-          | {
-              name?: T;
-              label?: T;
-              width?: T;
-              defaultValue?: T;
-              placeholder?: T;
-              options?:
-                | T
-                | {
-                    label?: T;
-                    value?: T;
-                    id?: T;
-                  };
-              required?: T;
-              id?: T;
-              blockName?: T;
-            };
-        text?:
-          | T
-          | {
-              name?: T;
-              label?: T;
-              width?: T;
-              defaultValue?: T;
-              required?: T;
-              id?: T;
-              blockName?: T;
-            };
-        textarea?:
-          | T
-          | {
-              name?: T;
-              label?: T;
-              width?: T;
-              defaultValue?: T;
-              required?: T;
-              id?: T;
-              blockName?: T;
-            };
-      };
-  submitButtonLabel?: T;
-  confirmationType?: T;
-  confirmationMessage?: T;
-  redirect?:
-    | T
-    | {
-        type?: T;
-        reference?: T;
-        url?: T;
-      };
-  emails?:
-    | T
-    | {
-        emailTo?: T;
-        cc?: T;
-        bcc?: T;
-        replyTo?: T;
-        emailFrom?: T;
-        subject?: T;
-        message?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "form-submissions_select".
- */
-export interface FormSubmissionsSelect<T extends boolean = true> {
-  form?: T;
-  submissionData?:
-    | T
-    | {
-        field?: T;
-        value?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1536,157 +655,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "header".
- */
-export interface Header {
-  id: number;
-  logo?: (number | null) | Media;
-  navegacion?:
-    | {
-        etiqueta: string;
-        /**
-         * Interna: /dictamenes · Externa: https://…
-         */
-        url: string;
-        nuevaPestana?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer".
- */
-export interface Footer {
-  id: number;
-  logos?:
-    | {
-        imagen: number | Media;
-        url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  usarMenuPrincipal?: boolean | null;
-  menu?:
-    | {
-        etiqueta: string;
-        /**
-         * Interna: /dictamenes · Externa: https://…
-         */
-        url: string;
-        nuevaPestana?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  legal?:
-    | {
-        etiqueta: string;
-        /**
-         * Interna: /dictamenes · Externa: https://…
-         */
-        url: string;
-        nuevaPestana?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  textoInferior?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contacto".
- */
-export interface Contacto {
-  id: number;
-  telefono?: string | null;
-  /**
-   * Hoy hay dos en la web (ces@larioja.org e info@ceslarioja.org): pon aquí el bueno.
-   */
-  email?: string | null;
-  emailPrensa?: string | null;
-  telefonoPrensa?: string | null;
-  direccion?: string | null;
-  horario?: string | null;
-  /**
-   * Texto que se busca en Google Maps para el mapa incrustado.
-   */
-  mapaQuery?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "header_select".
- */
-export interface HeaderSelect<T extends boolean = true> {
-  logo?: T;
-  navegacion?:
-    | T
-    | {
-        etiqueta?: T;
-        url?: T;
-        nuevaPestana?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer_select".
- */
-export interface FooterSelect<T extends boolean = true> {
-  logos?:
-    | T
-    | {
-        imagen?: T;
-        url?: T;
-        id?: T;
-      };
-  usarMenuPrincipal?: T;
-  menu?:
-    | T
-    | {
-        etiqueta?: T;
-        url?: T;
-        nuevaPestana?: T;
-        id?: T;
-      };
-  legal?:
-    | T
-    | {
-        etiqueta?: T;
-        url?: T;
-        nuevaPestana?: T;
-        id?: T;
-      };
-  textoInferior?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contacto_select".
- */
-export interface ContactoSelect<T extends boolean = true> {
-  telefono?: T;
-  email?: T;
-  emailPrensa?: T;
-  telefonoPrensa?: T;
-  direccion?: T;
-  horario?: T;
-  mapaQuery?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

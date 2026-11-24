@@ -30,45 +30,7 @@ export async function seed(payload: Payload) {
     payload.logger.info(`Usuario creado: ${email}`)
   }
 
-  // 2. Cabecera, pie y datos de contacto
-  const menu = [
-    ['Institución', '/institucion'],
-    ['Actividades', '/actividades'],
-    ['Dictámenes', '/dictamenes'],
-    ['Comunicación', '/comunicacion'],
-    ['Transparencia', '/transparencia'],
-    ['Enlaces', '/enlaces-de-interes'],
-    ['Contacto', '/contacto'],
-  ].map(([etiqueta, url]) => ({ etiqueta, url }))
-
-  await payload.updateGlobal({ slug: 'header', data: { navegacion: menu }, context })
-  await payload.updateGlobal({
-    slug: 'footer',
-    data: {
-      usarMenuPrincipal: true,
-      legal: [
-        { etiqueta: 'Política de privacidad', url: '/politica-de-privacidad' },
-        { etiqueta: 'Aviso legal', url: '/aviso-legal' },
-        { etiqueta: 'Política de cookies', url: '/politica-de-cookies' },
-      ],
-      textoInferior: 'Consejo Económico y Social de La Rioja',
-    },
-    context,
-  })
-  await payload.updateGlobal({
-    slug: 'contacto',
-    data: {
-      telefono: '941 545 178',
-      email: 'ces@larioja.org',
-      emailPrensa: 'prensa@ceslarioja.org',
-      direccion: 'C/ Vara de Rey 42, 6ª planta\n26002 Logroño (La Rioja)',
-      horario: 'Lunes - Viernes / 8.00 - 18.00',
-      mapaQuery: 'C/ Vara de Rey 42, 26002 Logroño',
-    },
-    context,
-  })
-
-  // 3. Comisiones de trabajo (los alias son las variantes vistas en WordPress)
+  // 2. Comisiones de trabajo (los alias son las variantes vistas en WordPress)
   const comisiones = [
     {
       nombre: 'Comisión de Trabajo de Empleo y Relaciones Laborales',
@@ -112,56 +74,6 @@ export async function seed(payload: Payload) {
   for (const [i, o] of organizaciones.entries()) {
     await upsert(payload, 'organizaciones', { nombre: { equals: o.nombre } }, { ...o, orden: i })
   }
-
-  // 5. Formulario de contacto (mismos campos que en WordPress)
-  const rich = (text: string) => ({
-    root: {
-      type: 'root',
-      format: '',
-      indent: 0,
-      version: 1,
-      direction: 'ltr',
-      children: [
-        {
-          type: 'paragraph',
-          format: '',
-          indent: 0,
-          version: 1,
-          direction: 'ltr',
-          textFormat: 0,
-          children: [{ type: 'text', text, format: 0, detail: 0, mode: 'normal', style: '', version: 1 }],
-        },
-      ],
-    },
-  })
-  await upsert(payload, 'forms', { title: { equals: 'Contacto' } }, {
-    title: 'Contacto',
-    submitButtonLabel: 'Enviar',
-    confirmationType: 'message',
-    confirmationMessage: rich('Gracias por escribirnos. Te responderemos lo antes posible.'),
-    fields: [
-      { blockType: 'text', name: 'nombre', label: 'Nombre', required: true, width: 50 },
-      { blockType: 'text', name: 'apellidos', label: 'Apellidos', width: 50 },
-      { blockType: 'email', name: 'email', label: 'Correo', required: true, width: 50 },
-      { blockType: 'text', name: 'telefono', label: 'Teléfono', width: 50 },
-      { blockType: 'textarea', name: 'mensaje', label: 'Mensaje', required: true, width: 100 },
-      {
-        blockType: 'checkbox',
-        name: 'privacidad',
-        label: 'He leído y acepto la política de privacidad',
-        required: true,
-        width: 100,
-      },
-    ],
-    emails: [
-      {
-        emailTo: 'ces@larioja.org',
-        replyTo: '{{email}}',
-        subject: 'Nuevo mensaje desde la web: {{nombre}} {{apellidos}}',
-        message: rich('Has recibido un mensaje desde el formulario de contacto de ceslarioja.org.'),
-      },
-    ],
-  })
 
   await importarContenido(payload)
   payload.logger.info('Seed completado.')
