@@ -1,4 +1,4 @@
-import { Catamaran, Roboto } from 'next/font/google'
+import { Catamaran, Martel, Roboto } from 'next/font/google'
 import React from 'react'
 
 import { Cookies } from '@/components/Cookies'
@@ -16,8 +16,15 @@ const roboto = Roboto({
 
 const catamaran = Catamaran({
   subsets: ['latin'],
-  weight: ['600', '700', '800'],
+  weight: ['400', '600', '700', '800'],
   variable: '--font-catamaran',
+  display: 'swap',
+})
+
+const martel = Martel({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-martel',
   display: 'swap',
 })
 
@@ -33,7 +40,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${roboto.variable} ${catamaran.variable}`}>
+    <html lang="es" className={`${roboto.variable} ${catamaran.variable} ${martel.variable}`}>
       <body>
         <Header />
         <main>{children}</main>

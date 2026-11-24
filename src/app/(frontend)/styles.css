@@ -909,9 +909,11 @@ body:has(.page-contacto) {
 .page-index h2 {
   margin: 0;
   color: #27273f;
+  font-family: var(--font-catamaran), 'Catamaran', sans-serif;
   font-size: 22px;
   font-weight: 600;
-  letter-spacing: 0.4px;
+  letter-spacing: normal;
+  line-height: 1.3;
 }
 
 .index-dots {
@@ -935,11 +937,14 @@ body:has(.page-contacto) {
 
 .page-index a {
   display: block;
-  padding: 12px 14px;
-  color: #243044;
+  padding: 13px 20px;
+  color: #54595f;
   text-align: left;
   text-decoration: none;
+  font-family: var(--font-catamaran), 'Catamaran', sans-serif;
   font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
 }
 
 .page-index a:hover {
@@ -952,6 +957,26 @@ body:has(.page-contacto) {
   font-size: 32px;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+.inner-prose.is-interior h2 {
+  margin: 0 0 20px;
+  font-family: var(--font-catamaran), 'Catamaran', sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.inner-prose.is-interior p,
+.inner-prose.is-interior li {
+  margin: 0 0 27px;
+  color: #022e7e;
+  font-family: var(--font-martel), 'Martel', serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 28.8px;
+  text-align: justify;
 }
 
 .inner-prose h2 a {
@@ -1260,6 +1285,7 @@ body:has(.page-contacto) {
   .access,
   .grid,
   .contact-grid,
+  .contact.is-page .contact-grid,
   .contact-details,
   .footer-grid,
   .form-row,

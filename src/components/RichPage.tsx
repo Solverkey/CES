@@ -67,7 +67,9 @@ export async function RichPage({
         </div>
       )}
       <div className={index.length ? 'container page-split' : 'container'}>
-        <article className={`prose inner-prose${slug === 'enlaces-de-interes' ? ' is-enlaces' : ''}`}>
+        <article
+          className={`prose inner-prose${slug === 'enlaces-de-interes' ? ' is-enlaces' : ''}${index.length ? ' is-interior' : ''}`}
+        >
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </article>
         {index.length ? (
