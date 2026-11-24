@@ -5,11 +5,13 @@ export function PageBanner({
   image,
   position = 'center center',
   categoria = '0',
+  search = true,
 }: {
   title: string
   image: string
   position?: string
   categoria?: string
+  search?: boolean
 }) {
   return (
     <>
@@ -27,9 +29,11 @@ export function PageBanner({
         </div>
         <div className="page-banner-photo" style={{ backgroundImage: `url(${image})`, backgroundPosition: position }} />
       </section>
-      <div className="container band overlap">
-        <SearchBar categoria={categoria} />
-      </div>
+      {search ? (
+        <div className="container band overlap">
+          <SearchBar categoria={categoria} />
+        </div>
+      ) : null}
     </>
   )
 }

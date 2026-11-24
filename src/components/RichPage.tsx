@@ -67,19 +67,8 @@ export async function RichPage({
         </div>
       )}
       <div className={index.length ? 'container page-split' : 'container'}>
-        <article className="prose inner-prose">
+        <article className={`prose inner-prose${slug === 'enlaces-de-interes' ? ' is-enlaces' : ''}`}>
           <div dangerouslySetInnerHTML={{ __html: html }} />
-          {page?.links?.length ? (
-            <ul className="link-list">
-              {page.links.map((link) => (
-                <li key={link.href}>
-                  <a href={link.href} target="_blank" rel="noopener noreferrer">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </article>
         {index.length ? (
           <aside className="page-index">

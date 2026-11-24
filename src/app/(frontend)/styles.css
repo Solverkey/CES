@@ -566,9 +566,106 @@ p {
   -webkit-line-clamp: unset;
 }
 
-.contact {
-  background: var(--cream);
-  padding: 28px 0 72px;
+html:has(.page-contacto),
+body:has(.page-contacto) {
+  background: #fff;
+}
+
+.page-contacto,
+.contact.is-page {
+  background: #fff;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-shadow: none;
+}
+
+.contact.is-page {
+  padding: 72px 0 56px;
+}
+
+.contact.is-page h2 {
+  color: #4c6c8c;
+  font-size: 35px;
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+
+.contact.is-page .contact-grid {
+  grid-template-columns: 1.15fr 0.72fr;
+  align-items: start;
+  gap: 48px;
+}
+
+.contact.is-page .form {
+  gap: 22px;
+}
+
+.contact.is-page .form-row {
+  gap: 28px;
+}
+
+.contact.is-page .check,
+.contact.is-page .check a {
+  color: #44484d;
+  font-size: 16px;
+}
+
+.contact.is-page .check a {
+  color: #245b9a;
+}
+
+.contact.is-page .form label {
+  color: #001b4b;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.contact.is-page .form input:not([type='checkbox']),
+.contact.is-page .form textarea {
+  border: 1px solid #c2d0e0;
+  height: 47px;
+}
+
+.contact.is-page .form textarea {
+  height: auto;
+  min-height: 140px;
+}
+
+.contact.is-page .btn {
+  background: #4c6c8c;
+  height: 46px;
+  font-size: 18px;
+}
+
+.contact.is-page .btn:hover {
+  background: #3d6488;
+  color: #fff;
+}
+
+.contact.is-page .map {
+  height: 640px;
+}
+
+.contact-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 56px;
+}
+
+.contact-details h3 {
+  margin: 0 0 8px;
+  color: #020c1e;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.contact-details p,
+.contact-details a {
+  margin: 0;
+  color: #44484d;
+  text-decoration: none;
 }
 
 .contact-card {
@@ -873,6 +970,33 @@ p {
   line-height: 1.75;
 }
 
+.inner-prose.is-enlaces p,
+.inner-prose.is-enlaces li {
+  color: #44484d;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.inner-prose.is-enlaces p {
+  text-align: justify;
+}
+
+.inner-prose.is-enlaces h2 {
+  width: min(900px, 100%);
+  margin: 20px auto;
+  padding: 14px 16px 14px 60px;
+  background: #fff;
+  color: #4c6c8c;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.inner-prose.is-enlaces h2 a {
+  color: #4c6c8c;
+}
+
 .page-head {
   padding: 48px 0 12px;
 }
@@ -1136,6 +1260,7 @@ p {
   .access,
   .grid,
   .contact-grid,
+  .contact-details,
   .footer-grid,
   .form-row,
   .page-banner,

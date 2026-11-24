@@ -1,53 +1,7 @@
 {
   "enlaces-de-interes": {
     "title": "Enlaces de interés",
-    "html": "<h2>Enlaces de interés</h2><p>En esta página se ofrecen los enlaces del conjunto del <strong>Consejo Económico y Social de España (CES)</strong> y de los <strong>Consejos Económicos y Sociales de las Comunidades Autónomas</strong> para encontrar:</p><ul><li>información sobre su composición, funciones, organizaciones representadas y sus actividades.</li><li>acceso a sus Dictámenes, Informes, Memorias y otras publicaciones.</li><li>espacio de información sobre la participación y el diálogo social en diferentes ámbitos.</li><li>enlaces seleccionados a los “sitios” WEB de interés documental e información general.</li></ul><h2><a href=\"http://www.ces.es/\" target=\"_blank\" rel=\"noopener noreferrer\">CES de España</a></h2><h2><a href=\"https://www.juntadeandalucia.es/empleoformacionytrabajoautonomo/ces/\" target=\"_blank\" rel=\"noopener noreferrer\">Andalucía</a></h2><h2><a href=\"http://www.aragon.es/cesa\" target=\"_blank\" rel=\"noopener noreferrer\">Aragón</a></h2><h2><a href=\"http://ces.caib.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Baleares</a></h2><h2><a href=\"http://www.cescanarias.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Canarias</a></h2><h2><a href=\"http://www.cescyl.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Castilla y León</a></h2><h2><a href=\"http://ctesc.gencat.cat/\" target=\"_blank\" rel=\"noopener noreferrer\">Cataluña</a></h2><h2><a href=\"http://www.ces-galicia.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Galicia</a></h2><h2><a href=\"http://www.cesmurcia.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Murcia</a></h2><h2><a href=\"http://www.cesegab.com/\" target=\"_blank\" rel=\"noopener noreferrer\">País Vasco</a></h2><h2><a href=\"http://www.ces.gva.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Com. Valenciana</a></h2>",
-    "links": [
-      {
-        "label": "CES de España",
-        "href": "http://www.ces.es/"
-      },
-      {
-        "label": "Andalucía",
-        "href": "https://www.juntadeandalucia.es/empleoformacionytrabajoautonomo/ces/"
-      },
-      {
-        "label": "Aragón",
-        "href": "http://www.aragon.es/cesa"
-      },
-      {
-        "label": "Baleares",
-        "href": "http://ces.caib.es/"
-      },
-      {
-        "label": "Canarias",
-        "href": "http://www.cescanarias.org/"
-      },
-      {
-        "label": "Castilla y León",
-        "href": "http://www.cescyl.es/"
-      },
-      {
-        "label": "Cataluña",
-        "href": "http://ctesc.gencat.cat/"
-      },
-      {
-        "label": "Galicia",
-        "href": "http://www.ces-galicia.org/"
-      },
-      {
-        "label": "Murcia",
-        "href": "http://www.cesmurcia.es/"
-      },
-      {
-        "label": "País Vasco",
-        "href": "http://www.cesegab.com/"
-      },
-      {
-        "label": "Com. Valenciana",
-        "href": "http://www.ces.gva.es/"
-      }
-    ]
+    "html": "<h2>Enlaces de interés</h2><p>En esta página se ofrecen los enlaces del conjunto del <strong>Consejo Económico y Social de España (CES)</strong> y de los <strong>Consejos Económicos y Sociales de las Comunidades Autónomas</strong> para encontrar:</p><ul><li>información sobre su composición, funciones, organizaciones representadas y sus actividades.</li><li>acceso a sus Dictámenes, Informes, Memorias y otras publicaciones.</li><li>espacio de información sobre la participación y el diálogo social en diferentes ámbitos.</li><li>enlaces seleccionados a los “sitios” WEB de interés documental e información general.</li></ul><h2><a href=\"http://www.ces.es/\" target=\"_blank\" rel=\"noopener noreferrer\">CES de España</a></h2><h2><a href=\"https://www.juntadeandalucia.es/empleoformacionytrabajoautonomo/ces/\" target=\"_blank\" rel=\"noopener noreferrer\">Andalucía</a></h2><h2><a href=\"http://www.aragon.es/cesa\" target=\"_blank\" rel=\"noopener noreferrer\">Aragón</a></h2><h2><a href=\"http://ces.caib.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Baleares</a></h2><h2><a href=\"http://www.cescanarias.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Canarias</a></h2><h2><a href=\"http://www.cescyl.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Castilla y León</a></h2><h2><a href=\"http://ctesc.gencat.cat/\" target=\"_blank\" rel=\"noopener noreferrer\">Cataluña</a></h2><h2><a href=\"http://www.ces-galicia.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Galicia</a></h2><h2><a href=\"http://www.cesmurcia.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Murcia</a></h2><h2><a href=\"http://www.cesegab.com/\" target=\"_blank\" rel=\"noopener noreferrer\">País Vasco</a></h2><h2><a href=\"http://www.ces.gva.es/\" target=\"_blank\" rel=\"noopener noreferrer\">Com. Valenciana</a></h2>"
   },
   "politica-de-cookies": {
     "title": "Política de cookies",
