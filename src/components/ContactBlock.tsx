@@ -24,26 +24,32 @@ export function ContactBlock({ showMap = true }: { showMap?: boolean }) {
             >
               <div className="form-row">
                 <label>
-                  Nombre <i className="req">*</i>
+                  <span>
+                    Nombre <i className="req">*</i>
+                  </span>
                   <input name="nombre" required autoComplete="given-name" />
                 </label>
                 <label>
-                  Apellidos
+                  <span>Apellidos</span>
                   <input name="apellidos" autoComplete="family-name" />
                 </label>
               </div>
               <div className="form-row">
                 <label>
-                  Correo <i className="req">*</i>
+                  <span>
+                    Correo <i className="req">*</i>
+                  </span>
                   <input name="correo" type="email" required autoComplete="email" />
                 </label>
                 <label>
-                  Teléfono
+                  <span>Teléfono</span>
                   <input name="telefono" type="tel" autoComplete="tel" />
                 </label>
               </div>
               <label>
-                Mensaje <i className="req">*</i>
+                <span>
+                  Mensaje <i className="req">*</i>
+                </span>
                 <textarea name="mensaje" required rows={6} />
               </label>
               <label className="check">

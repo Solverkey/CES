@@ -1,5 +1,5 @@
 import { Pager } from '@/components/Pager'
-import { PostGrid } from '@/components/PostCard'
+import { PostCard } from '@/components/PostCard'
 import { SearchBar } from '@/components/SearchBar'
 import { loadPosts } from '@/lib/cms'
 import { one, pageNumber, paginate, searchPosts } from '@/lib/content'
@@ -35,7 +35,19 @@ export default async function BuscarPage({
           <p className="result-count">
             {result.total} {result.total === 1 ? 'resultado' : 'resultados'}
           </p>
-          <PostGrid posts={result.items} />
+          {result.items.length ? (
+            <div className="grid grid-media">
+              {result.items.map((post) => (
+                <PostCard
+                  key={post.slug}
+                  post={post}
+                  variant={post.category === 'dictamenes' ? 'classic' : 'media'}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="empty">No hay publicaciones con esos criterios.</p>
+          )}
           <Pager page={result.page} totalPages={result.totalPages} path="/buscar" query={query} />
         </div>
       </section>

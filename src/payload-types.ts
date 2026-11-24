@@ -265,50 +265,13 @@ export interface Actividade {
   fechaActo?: string | null;
   hora?: string | null;
   lugar?: string | null;
-  imagenUrl?: string | null;
   /**
-   * Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.
-   */
-  extracto?: string | null;
-  cuerpo?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  publishedAt?: string | null;
-  autor?: (number | null) | User;
-  /**
-   * Se rellena solo a partir del título. La URL será ceslarioja.org/<slug>/
-   */
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "noticias".
- */
-export interface Noticia {
-  id: number;
-  title: string;
-  /**
-   * La foto de la noticia. Arrástrala o elígela en el ordenador.
+   * La foto de la actividad. Arrástrala o elígela en el ordenador.
    */
   imagen?: (number | null) | Imagene;
   imagenUrl?: string | null;
   /**
-   * Una frase para la tarjeta. Si lo dejas vacío, se usa el principio del texto.
+   * Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.
    */
   extracto?: string | null;
   cuerpo?: {
@@ -353,6 +316,47 @@ export interface Imagene {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "noticias".
+ */
+export interface Noticia {
+  id: number;
+  title: string;
+  /**
+   * La foto de la noticia. Arrástrala o elígela en el ordenador.
+   */
+  imagen?: (number | null) | Imagene;
+  imagenUrl?: string | null;
+  /**
+   * Una frase para la tarjeta. Si lo dejas vacío, se usa el principio del texto.
+   */
+  extracto?: string | null;
+  cuerpo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  publishedAt?: string | null;
+  autor?: (number | null) | User;
+  /**
+   * Se rellena solo a partir del título. La URL será ceslarioja.org/<slug>/
+   */
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -531,6 +535,7 @@ export interface ActividadesSelect<T extends boolean = true> {
   fechaActo?: T;
   hora?: T;
   lugar?: T;
+  imagen?: T;
   imagenUrl?: T;
   extracto?: T;
   cuerpo?: T;

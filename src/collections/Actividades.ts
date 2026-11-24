@@ -67,7 +67,18 @@ export const Actividades: CollectionConfig = {
         },
       ],
     },
-    { name: 'imagenUrl', label: 'URL de la imagen', type: 'text' },
+    {
+      name: 'imagen',
+      label: 'Foto',
+      type: 'upload',
+      relationTo: 'imagenes',
+      admin: { description: 'La foto de la actividad. Arrástrala o elígela en el ordenador.' },
+    },
+    {
+      name: 'imagenUrl',
+      type: 'text',
+      admin: { components: { Field: '@/fields/FotoGuardada#FotoGuardada' } },
+    },
     {
       name: 'extracto',
       label: 'Extracto',
@@ -86,6 +97,21 @@ export const Actividades: CollectionConfig = {
     slugField(),
   ],
   hooks: {
+    afterRead: [
+      async ({ doc, findMany, req }) => {
+        if (findMany || req.context.fotoPublicada || doc.imagen || doc.imagenUrl || !doc.id) return doc
+        const published = await req.payload.findByID({
+          collection: 'actividades',
+          id: doc.id,
+          depth: 0,
+          draft: false,
+          overrideAccess: true,
+          context: { fotoPublicada: true },
+        })
+        if (typeof published?.imagenUrl === 'string') doc.imagenUrl = published.imagenUrl
+        return doc
+      },
+    ],
     afterChange: [revalidateDoc('/actividades')],
     afterDelete: [revalidateDelete('/actividades')],
   },

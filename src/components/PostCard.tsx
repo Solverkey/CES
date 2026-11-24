@@ -7,9 +7,13 @@ export type CardVariant = 'plain' | 'media' | 'classic'
 function blurb(post: Post, variant: CardVariant) {
   if (variant === 'media') {
     const plain = post.html
-      .replace(/<img[^>]*>/gi, ' ')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
+      .replace(/<img[^>]*>/gi, '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{2,}/g, '\n')
+      .replace(/[ \t]{2,}/g, ' ')
       .trim()
     return plain || post.excerpt
   }

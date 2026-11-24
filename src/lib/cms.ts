@@ -72,9 +72,20 @@ function comisionName(value: unknown, nombres: Map<number, string>) {
   return textOf(value)
 }
 
-function toPost(doc: Doc, category: Category, categoryLabel: string, nombres: Map<number, string>): Post | null {
+function relationId(value: unknown) {
+  return typeof value === 'number' ? value : null
+}
+
+function toPost(
+  doc: Doc,
+  category: Category,
+  categoryLabel: string,
+  nombres: Map<number, string>,
+  fotos: Map<number, string>,
+): Post | null {
   if (!doc.slug || !doc.title) return null
   const date = (doc.fecha || doc.publishedAt || '').slice(0, 10)
+  const subida = relationId(doc.imagen)
   return {
     slug: doc.slug,
     title: doc.title,
@@ -82,7 +93,7 @@ function toPost(doc: Doc, category: Category, categoryLabel: string, nombres: Ma
     category,
     categoryLabel,
     excerpt: doc.extracto || doc.resumen || '',
-    image: fileUrl(doc.imagen) || doc.imagenUrl || null,
+    image: (subida ? fotos.get(subida) : '') || fileUrl(doc.imagen) || doc.imagenUrl || null,
     pdf: fileUrl(doc.pdf) || doc.archivoUrl || null,
     lugar: doc.lugar || '',
     fechaTexto: '',
@@ -96,10 +107,11 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
   const payload = await payloadOrNull()
   if (!payload) return localPosts
 
+  const published = { _status: { equals: 'published' } }
   const [dictamenes, actividades, noticias, comisiones] = await Promise.all([
-    payload.find({ collection: 'dictamenes', limit: 500, depth: 0, sort: '-fecha', pagination: false }),
-    payload.find({ collection: 'actividades', limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
-    payload.find({ collection: 'noticias', limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
+    payload.find({ collection: 'dictamenes', where: published, limit: 500, depth: 0, sort: '-fecha', pagination: false }),
+    payload.find({ collection: 'actividades', where: published, limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
+    payload.find({ collection: 'noticias', where: published, limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
     payload.find({ collection: 'comisiones', limit: 100, depth: 0, pagination: false }),
   ])
 
@@ -108,10 +120,28 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
     if (typeof doc.nombre === 'string') nombres.set(doc.id, doc.nombre)
   }
 
+  const fotoIds = [...actividades.docs, ...noticias.docs].flatMap((doc) => {
+    const id = relationId((doc as Doc).imagen)
+    return id ? [id] : []
+  })
+  const fotos = new Map<number, string>()
+  if (fotoIds.length) {
+    const imagenes = await payload.find({
+      collection: 'imagenes',
+      where: { id: { in: fotoIds } },
+      limit: fotoIds.length,
+      depth: 0,
+      pagination: false,
+    })
+    for (const doc of imagenes.docs) {
+      if (typeof doc.url === 'string') fotos.set(doc.id, doc.url)
+    }
+  }
+
   const items = [
-    ...dictamenes.docs.map((doc) => toPost(doc, 'dictamenes', 'Dictámenes', nombres)),
-    ...actividades.docs.map((doc) => toPost(doc, 'actividades', 'Actividades', nombres)),
-    ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Comunicación', nombres)),
+    ...dictamenes.docs.map((doc) => toPost(doc, 'dictamenes', 'Dictámenes', nombres, fotos)),
+    ...actividades.docs.map((doc) => toPost(doc, 'actividades', 'Actividades', nombres, fotos)),
+    ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Comunicación', nombres, fotos)),
   ].filter((post): post is Post => Boolean(post))
 
   if (!items.length) return localPosts

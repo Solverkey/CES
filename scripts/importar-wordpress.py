@@ -196,8 +196,6 @@ def category_of(ids: list[int], title: str) -> tuple[str, str]:
     for cid in (11, 10, 12):
         if cid in ids:
             return CATS[cid]
-    if title.lower().startswith("dictamen"):
-        return CATS[11]
     if 1 in ids:
         return CATS[1]
     return ("otros", "Uncategorized")

@@ -16,10 +16,14 @@ export function PageBanner({
       <section className="page-banner">
         <div className="page-banner-title">
           <h1>{title}</h1>
-          <span className="banner-dots" aria-hidden="true">
-            •••
+          <span className="banner-mark" aria-hidden="true">
+            <span className="banner-dots">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className="banner-line" />
           </span>
-          <span className="banner-line" />
         </div>
         <div className="page-banner-photo" style={{ backgroundImage: `url(${image})`, backgroundPosition: position }} />
       </section>
