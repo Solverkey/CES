@@ -52,7 +52,8 @@ export async function importarContenido(payload: Payload) {
         limit: 1,
         depth: 0,
       })
-      const data = { ...shared, ...meta, resumen: post.excerpt, archivoUrl: post.pdf || undefined }
+      // El campo convierte el HTML a editor enriquecido al guardar.
+      const data = { ...shared, ...meta, resumen: post.excerpt, archivoUrl: post.pdf || undefined } as never
       if (existing.docs[0]) {
         await payload.update({ collection: 'dictamenes', id: existing.docs[0].id, data, context })
       } else {
@@ -79,10 +80,11 @@ export async function importarContenido(payload: Payload) {
             imagenUrl: post.image || undefined,
           }
         : { ...shared, imagenUrl: post.image || undefined }
+    const payloadData = data as never
     if (existing.docs[0]) {
-      await payload.update({ collection, id: existing.docs[0].id, data, context })
+      await payload.update({ collection, id: existing.docs[0].id, data: payloadData, context })
     } else {
-      await payload.create({ collection, data, context })
+      await payload.create({ collection, data: payloadData, context })
     }
   }
 

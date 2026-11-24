@@ -1,3 +1,4 @@
+import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
@@ -17,9 +18,11 @@ type Doc = {
   publishedAt?: string | null
   resumen?: string | null
   extracto?: string | null
-  cuerpo?: string | null
+  cuerpo?: unknown
   archivoUrl?: string | null
+  pdf?: unknown
   imagenUrl?: string | null
+  imagen?: unknown
   lugar?: string | null
   hora?: string | null
   fechaTexto?: string | null
@@ -48,6 +51,21 @@ function textOf(value: unknown) {
   return ''
 }
 
+function fileUrl(value: unknown) {
+  if (typeof value === 'string') return value
+  if (value && typeof value === 'object' && 'url' in value && typeof value.url === 'string') return value.url
+  return ''
+}
+
+function cuerpoHtml(value: unknown) {
+  if (!value) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'object' && 'root' in value) {
+    return convertLexicalToHTML({ data: value as never, disableContainer: true })
+  }
+  return ''
+}
+
 function toPost(doc: Doc, category: Category, categoryLabel: string): Post | null {
   if (!doc.slug || !doc.title) return null
   const date = (doc.fecha || doc.publishedAt || '').slice(0, 10)
@@ -58,13 +76,13 @@ function toPost(doc: Doc, category: Category, categoryLabel: string): Post | nul
     category,
     categoryLabel,
     excerpt: doc.extracto || doc.resumen || '',
-    image: doc.imagenUrl || null,
-    pdf: doc.archivoUrl || null,
+    image: fileUrl(doc.imagen) || doc.imagenUrl || null,
+    pdf: fileUrl(doc.pdf) || doc.archivoUrl || null,
     lugar: doc.lugar || '',
     fechaTexto: '',
     hora: doc.hora || '',
     comision: textOf(doc.comision),
-    html: doc.cuerpo || '',
+    html: cuerpoHtml(doc.cuerpo),
   }
 }
 
@@ -75,7 +93,7 @@ export async function loadPosts(): Promise<Post[]> {
   const [dictamenes, actividades, noticias] = await Promise.all([
     payload.find({ collection: 'dictamenes', limit: 500, depth: 1, sort: '-fecha', pagination: false }),
     payload.find({ collection: 'actividades', limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
-    payload.find({ collection: 'noticias', limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
+    payload.find({ collection: 'noticias', limit: 200, depth: 1, sort: '-publishedAt', pagination: false }),
   ])
 
   const items = [

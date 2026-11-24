@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated, publishedOrAuthenticated } from '../access'
-import { slugField, wpIdField } from '../fields/slug'
+import { cuerpoField } from '../fields/cuerpo'
+import { slugField } from '../fields/slug'
 import { revalidateDelete, revalidateDoc } from '../hooks/revalidate'
 
 export const Dictamenes: CollectionConfig = {
@@ -70,14 +71,15 @@ export const Dictamenes: CollectionConfig = {
       type: 'textarea',
       admin: { description: 'Si se rellena, aparece en la ficha encima del botón de descarga.' },
     },
-    { name: 'contenido', label: 'Contenido adicional (opcional)', type: 'richText' },
-    { name: 'cuerpo', label: 'Texto de la ficha', type: 'textarea' },
+    cuerpoField,
     {
-      name: 'archivoUrl',
-      label: 'Enlace al PDF',
-      type: 'text',
-      admin: { description: 'Dirección del PDF firmado. Es lo que se abre desde la ficha.' },
+      name: 'pdf',
+      label: 'PDF',
+      type: 'upload',
+      relationTo: 'documentos',
+      admin: { description: 'Súbelo aquí. Es el documento que se abre desde la ficha.' },
     },
+    { name: 'archivoUrl', type: 'text', admin: { hidden: true } },
     {
       name: 'publishedAt',
       label: 'Fecha de publicación en la web',
@@ -86,7 +88,6 @@ export const Dictamenes: CollectionConfig = {
     },
     { name: 'autor', label: 'Autor', type: 'relationship', relationTo: 'users', admin: { position: 'sidebar' } },
     slugField(),
-    wpIdField,
   ],
   hooks: {
     afterChange: [revalidateDoc('/dictamenes')],

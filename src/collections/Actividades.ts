@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated, publishedOrAuthenticated } from '../access'
-import { slugField, wpIdField } from '../fields/slug'
+import { cuerpoField } from '../fields/cuerpo'
+import { slugField } from '../fields/slug'
 import { revalidateDelete, revalidateDoc } from '../hooks/revalidate'
 
 export const Actividades: CollectionConfig = {
@@ -73,8 +74,7 @@ export const Actividades: CollectionConfig = {
       type: 'textarea',
       admin: { description: 'Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.' },
     },
-    { name: 'contenido', label: 'Contenido', type: 'richText' },
-    { name: 'cuerpo', label: 'Texto de la ficha', type: 'textarea' },
+    cuerpoField,
     {
       name: 'publishedAt',
       label: 'Fecha de publicación',
@@ -84,7 +84,6 @@ export const Actividades: CollectionConfig = {
     },
     { name: 'autor', label: 'Autor', type: 'relationship', relationTo: 'users', admin: { position: 'sidebar' } },
     slugField(),
-    wpIdField,
   ],
   hooks: {
     afterChange: [revalidateDoc('/actividades')],

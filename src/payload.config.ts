@@ -1,6 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
-import { seoPlugin } from '@payloadcms/plugin-seo'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -11,6 +10,8 @@ import { fileURLToPath } from 'url'
 import { Actividades } from './collections/Actividades'
 import { Comisiones } from './collections/Comisiones'
 import { Dictamenes } from './collections/Dictamenes'
+import { Documentos } from './collections/Documentos'
+import { Imagenes } from './collections/Imagenes'
 import { Noticias } from './collections/Noticias'
 import { Organizaciones } from './collections/Organizaciones'
 import { Users } from './collections/Users'
@@ -22,8 +23,6 @@ const SITE_NAME = 'CES La Rioja'
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const connectionString = process.env.DATABASE_URL || ''
 const usesSupabase = /supabase\.(co|com)/.test(connectionString)
-
-const docPath = (doc: { slug?: string | null }) => `/${doc?.slug ?? ''}`
 
 export default buildConfig({
   serverURL: serverUrl,
@@ -37,6 +36,8 @@ export default buildConfig({
     Dictamenes,
     Actividades,
     Noticias,
+    Documentos,
+    Imagenes,
     Comisiones,
     Organizaciones,
     Users,
@@ -55,12 +56,6 @@ export default buildConfig({
   }),
   sharp,
   plugins: [
-    seoPlugin({
-      collections: ['dictamenes', 'actividades', 'noticias'],
-      tabbedUI: true,
-      generateTitle: ({ doc }) => (doc?.title ? `${doc.title} | ${SITE_NAME}` : SITE_NAME),
-      generateURL: ({ doc }) => `${serverUrl}${docPath(doc)}`,
-    }),
     redirectsPlugin({
       collections: ['dictamenes', 'actividades', 'noticias'],
       overrides: {

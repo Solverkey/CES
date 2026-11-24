@@ -70,6 +70,8 @@ export interface Config {
     dictamenes: Dictamene;
     actividades: Actividade;
     noticias: Noticia;
+    documentos: Documento;
+    imagenes: Imagene;
     comisiones: Comisione;
     organizaciones: Organizacione;
     users: User;
@@ -84,6 +86,8 @@ export interface Config {
     dictamenes: DictamenesSelect<false> | DictamenesSelect<true>;
     actividades: ActividadesSelect<false> | ActividadesSelect<true>;
     noticias: NoticiasSelect<false> | NoticiasSelect<true>;
+    documentos: DocumentosSelect<false> | DocumentosSelect<true>;
+    imagenes: ImagenesSelect<false> | ImagenesSelect<true>;
     comisiones: ComisionesSelect<false> | ComisionesSelect<true>;
     organizaciones: OrganizacionesSelect<false> | OrganizacionesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -153,7 +157,7 @@ export interface Dictamene {
    * Si se rellena, aparece en la ficha encima del botón de descarga.
    */
   resumen?: string | null;
-  contenido?: {
+  cuerpo?: {
     root: {
       type: string;
       children: {
@@ -168,22 +172,17 @@ export interface Dictamene {
     };
     [k: string]: unknown;
   } | null;
-  cuerpo?: string | null;
   /**
-   * Dirección del PDF firmado. Es lo que se abre desde la ficha.
+   * Súbelo aquí. Es el documento que se abre desde la ficha.
    */
+  pdf?: (number | null) | Documento;
   archivoUrl?: string | null;
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
-   * Se genera a partir del título. La URL será ceslarioja.org/<slug>/
+   * Se rellena solo a partir del título. La URL será ceslarioja.org/<slug>/
    */
   slug: string;
-  wpId?: number | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -208,6 +207,24 @@ export interface Comisione {
   orden?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentos".
+ */
+export interface Documento {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -253,7 +270,7 @@ export interface Actividade {
    * Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.
    */
   extracto?: string | null;
-  contenido?: {
+  cuerpo?: {
     root: {
       type: string;
       children: {
@@ -268,18 +285,12 @@ export interface Actividade {
     };
     [k: string]: unknown;
   } | null;
-  cuerpo?: string | null;
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
-   * Se genera a partir del título. La URL será ceslarioja.org/<slug>/
+   * Se rellena solo a partir del título. La URL será ceslarioja.org/<slug>/
    */
   slug: string;
-  wpId?: number | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -291,12 +302,16 @@ export interface Actividade {
 export interface Noticia {
   id: number;
   title: string;
+  /**
+   * La foto de la noticia. Arrástrala o elígela en el ordenador.
+   */
+  imagen?: (number | null) | Imagene;
   imagenUrl?: string | null;
   /**
-   * Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.
+   * Una frase para la tarjeta. Si lo dejas vacío, se usa el principio del texto.
    */
   extracto?: string | null;
-  contenido?: {
+  cuerpo?: {
     root: {
       type: string;
       children: {
@@ -311,21 +326,33 @@ export interface Noticia {
     };
     [k: string]: unknown;
   } | null;
-  cuerpo?: string | null;
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
-   * Se genera a partir del título. La URL será ceslarioja.org/<slug>/
+   * Se rellena solo a partir del título. La URL será ceslarioja.org/<slug>/
    */
   slug: string;
-  wpId?: number | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "imagenes".
+ */
+export interface Imagene {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -406,6 +433,14 @@ export interface PayloadLockedDocument {
         value: number | Noticia;
       } | null)
     | ({
+        relationTo: 'documentos';
+        value: number | Documento;
+      } | null)
+    | ({
+        relationTo: 'imagenes';
+        value: number | Imagene;
+      } | null)
+    | ({
         relationTo: 'comisiones';
         value: number | Comisione;
       } | null)
@@ -475,19 +510,12 @@ export interface DictamenesSelect<T extends boolean = true> {
   comision?: T;
   tipoNorma?: T;
   resumen?: T;
-  contenido?: T;
   cuerpo?: T;
+  pdf?: T;
   archivoUrl?: T;
   publishedAt?: T;
   autor?: T;
   slug?: T;
-  wpId?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -505,18 +533,10 @@ export interface ActividadesSelect<T extends boolean = true> {
   lugar?: T;
   imagenUrl?: T;
   extracto?: T;
-  contenido?: T;
   cuerpo?: T;
   publishedAt?: T;
   autor?: T;
   slug?: T;
-  wpId?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -527,23 +547,50 @@ export interface ActividadesSelect<T extends boolean = true> {
  */
 export interface NoticiasSelect<T extends boolean = true> {
   title?: T;
+  imagen?: T;
   imagenUrl?: T;
   extracto?: T;
-  contenido?: T;
   cuerpo?: T;
   publishedAt?: T;
   autor?: T;
   slug?: T;
-  wpId?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentos_select".
+ */
+export interface DocumentosSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "imagenes_select".
+ */
+export interface ImagenesSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

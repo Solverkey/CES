@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated, publishedOrAuthenticated } from '../access'
-import { slugField, wpIdField } from '../fields/slug'
+import { cuerpoField } from '../fields/cuerpo'
+import { slugField } from '../fields/slug'
 import { revalidateDelete, revalidateDoc } from '../hooks/revalidate'
 
 /** Sección «Comunicación» del menú. */
@@ -23,15 +24,21 @@ export const Noticias: CollectionConfig = {
   versions: { drafts: true },
   fields: [
     { name: 'title', label: 'Título', type: 'text', required: true },
-    { name: 'imagenUrl', label: 'URL de la imagen', type: 'text' },
+    {
+      name: 'imagen',
+      label: 'Foto',
+      type: 'upload',
+      relationTo: 'imagenes',
+      admin: { description: 'La foto de la noticia. Arrástrala o elígela en el ordenador.' },
+    },
+    { name: 'imagenUrl', type: 'text', admin: { hidden: true } },
     {
       name: 'extracto',
-      label: 'Extracto',
+      label: 'Resumen',
       type: 'textarea',
-      admin: { description: 'Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.' },
+      admin: { description: 'Una frase para la tarjeta. Si lo dejas vacío, se usa el principio del texto.' },
     },
-    { name: 'contenido', label: 'Contenido', type: 'richText' },
-    { name: 'cuerpo', label: 'Texto de la ficha', type: 'textarea' },
+    { ...cuerpoField, label: 'Texto' },
     {
       name: 'publishedAt',
       label: 'Fecha de publicación',
@@ -41,7 +48,6 @@ export const Noticias: CollectionConfig = {
     },
     { name: 'autor', label: 'Autor', type: 'relationship', relationTo: 'users', admin: { position: 'sidebar' } },
     slugField(),
-    wpIdField,
   ],
   hooks: {
     afterChange: [revalidateDoc('/comunicacion')],
