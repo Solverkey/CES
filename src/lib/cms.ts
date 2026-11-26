@@ -185,7 +185,6 @@ async function readPosts(payload: Payload, options?: { draft?: boolean; user?: T
     ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Comunicación', nombres, fotos)),
   ].filter((post): post is Post => Boolean(post))
 
-  if (!items.length) return localPosts
   return items.sort((a, b) => b.date.localeCompare(a.date))
 }
 
@@ -198,9 +197,21 @@ const loadPublishedCached = unstable_cache(() => loadPostsFromDatabase(), ['ces-
 export async function loadPublishedPosts() {
   if (!databaseReady()) return localPosts
   try {
-    return await loadPublishedCached()
+    const posts = await loadPublishedCached()
+    return posts.length ? posts : localPosts
   } catch {
     return localPosts
+  }
+}
+
+/** Slugs publicados en la base. `null` si no se ha podido consultar. */
+export async function cmsPublishedSlugs(): Promise<Set<string> | null> {
+  if (!databaseReady()) return null
+  try {
+    const posts = await loadPublishedCached()
+    return new Set(posts.map((post) => post.slug))
+  } catch {
+    return null
   }
 }
 
@@ -224,7 +235,8 @@ export async function loadPosts() {
   const user = await editorFromCookies()
   if (!user) return loadPublishedPosts()
   try {
-    return await loadPostsFromDatabase({ draft: true, user })
+    const drafts = await loadPostsFromDatabase({ draft: true, user })
+    return drafts.length ? drafts : loadPublishedPosts()
   } catch {
     return loadPublishedPosts()
   }

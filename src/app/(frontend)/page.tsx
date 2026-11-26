@@ -4,10 +4,25 @@ import { ContactBlock } from '@/components/ContactBlock'
 import { PostGrid } from '@/components/PostCard'
 import { SearchBar } from '@/components/SearchBar'
 import { loadPosts } from '@/lib/cms'
+import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/seo'
 
 export const metadata = {
   alternates: { canonical: '/' },
-  openGraph: { url: '/' },
+  openGraph: {
+    type: 'website' as const,
+    locale: 'es_ES',
+    siteName: SITE_NAME,
+    title: 'Inicio - CES La Rioja',
+    description: SITE_DESCRIPTION,
+    url: '/',
+    images: ['/brand/logo.png'],
+  },
+  twitter: {
+    card: 'summary_large_image' as const,
+    title: 'Inicio - CES La Rioja',
+    description: SITE_DESCRIPTION,
+    images: ['/brand/logo.png'],
+  },
 }
 
 export default async function HomePage() {

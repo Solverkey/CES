@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { JsonLd } from '@/components/JsonLd'
-import { loadPosts, loadPublishedPosts } from '@/lib/cms'
+import { cmsPublishedSlugs, loadPosts, loadPublishedPosts } from '@/lib/cms'
 import { findPost, type Post } from '@/lib/content'
 import { applyRedirect } from '@/lib/redirects'
 import { absoluteUrl } from '@/lib/site'
@@ -75,12 +76,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const { isEnabled } = await draftMode()
   const loaded = await loadPosts()
-  const post = loaded.find((item) => item.slug === slug) || findPost(slug)
-  if (!post) {
-    await applyRedirect(`/${slug}`)
-    notFound()
+  const fromList = loaded.find((item) => item.slug === slug)
+  if (!isEnabled || !fromList) {
+    const published = await cmsPublishedSlugs()
+    if (published && !published.has(slug)) await applyRedirect(`/${slug}`)
   }
+  const post = fromList || findPost(slug)
+  if (!post) notFound()
 
   const siblings = loaded.filter((item) => item.category === post.category)
   const index = siblings.findIndex((item) => item.slug === post.slug)
