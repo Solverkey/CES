@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CONSENT_MAX_AGE_MS, CONSENT_VERSION, parseConsent } from '@/lib/consent'
 import { validarMensaje } from '@/lib/mensaje'
+import { safePreviewPath } from '@/lib/previewPath'
 
 describe('consentimiento', () => {
   const now = Date.parse('2026-11-26T12:00:00Z')
@@ -16,6 +17,17 @@ describe('consentimiento', () => {
     expect(parseConsent('cancelada', now)).toBeNull()
     expect(parseConsent(JSON.stringify({ version: 0, maps: true, at: now }), now)).toBeNull()
     expect(parseConsent(JSON.stringify({ version: CONSENT_VERSION, maps: true, at: now - CONSENT_MAX_AGE_MS - 1 }), now)).toBeNull()
+  })
+})
+
+describe('ruta de vista previa', () => {
+  it('solo admite rutas internas', () => {
+    expect(safePreviewPath('/dictamen-1')).toBe('/dictamen-1')
+    expect(safePreviewPath('//evil.com')).toBe('/')
+    expect(safePreviewPath('/\\evil.com')).toBe('/')
+    expect(safePreviewPath('/%5Cevil.com')).toBe('/')
+    expect(safePreviewPath('/%2F%2Fevil.com')).toBe('/')
+    expect(safePreviewPath('/admin')).toBe('/')
   })
 })
 

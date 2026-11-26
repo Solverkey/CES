@@ -25,6 +25,7 @@ export async function enviarMensaje(_prev: MensajeState, formData: FormData): Pr
       collection: 'mensajes',
       data: parsed.data,
       overrideAccess: true,
+      context: { contactoConsentido: true },
     })
     return { ok: true }
   } catch {

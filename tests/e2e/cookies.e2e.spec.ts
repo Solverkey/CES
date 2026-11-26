@@ -50,7 +50,18 @@ test.describe('Cookies y SEO', () => {
     await page.locator('input[name="privacidad"]').check()
     await page.getByRole('button', { name: 'Enviar' }).click()
     await expect(page.locator('.form-error')).toContainText('No se ha podido enviar')
+    await expect(page.locator('textarea[name="mensaje"]')).toHaveValue('Hola')
     await expect(page.getByText('Gracias por escribirnos')).toHaveCount(0)
+  })
+
+  test('escape no borra una aceptación ya guardada', async ({ page }) => {
+    await page.goto(`${origin}/contacto`)
+    await page.getByRole('button', { name: 'Aceptar' }).click()
+    await expect(page.locator('iframe.map')).toHaveCount(1)
+    await page.getByRole('button', { name: 'Configurar cookies' }).click()
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page.locator('iframe.map')).toHaveCount(1)
   })
 
   test('sitemap y robots', async ({ request }) => {

@@ -1,6 +1,7 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 
-import { anyone, authenticated } from '../access'
+import { authenticated } from '../access'
+import { validarMensaje } from '../lib/mensaje'
 
 /** Mensajes del formulario de contacto. Solo los lee el personal del panel. */
 export const Mensajes: CollectionConfig = {
@@ -12,10 +13,31 @@ export const Mensajes: CollectionConfig = {
     defaultColumns: ['nombre', 'correo', 'createdAt'],
   },
   access: {
-    create: anyone,
+    // El alta pública solo pasa por la acción del formulario, que marca el contexto.
+    create: () => false,
     read: authenticated,
     update: authenticated,
     delete: authenticated,
+  },
+  hooks: {
+    beforeValidate: [
+      ({ data, req }) => {
+        if (!req.context.contactoConsentido) {
+          throw new APIError('El mensaje solo se acepta desde el formulario de contacto.', 403)
+        }
+        const parsed = validarMensaje({
+          nombre: String(data?.nombre || ''),
+          apellidos: String(data?.apellidos || ''),
+          correo: String(data?.correo || ''),
+          telefono: String(data?.telefono || ''),
+          mensaje: String(data?.mensaje || ''),
+          privacidad: true,
+          completo: false,
+        })
+        if (!parsed.ok) throw new APIError(parsed.error, 400)
+        return { ...data, ...parsed.data }
+      },
+    ],
   },
   fields: [
     { name: 'nombre', label: 'Nombre', type: 'text', required: true },

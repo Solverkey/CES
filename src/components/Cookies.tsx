@@ -44,12 +44,22 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     setOpen(false)
   }, [])
 
+  const close = useCallback(() => {
+    setConfiguring(false)
+    setOpen(false)
+  }, [])
+
   const openPanel = useCallback(() => {
     const stored = parseConsent(window.localStorage.getItem(CONSENT_KEY))
     setMaps(stored?.maps === true)
     setConfiguring(false)
     setOpen(true)
   }, [])
+
+  const onEscape = useCallback(() => {
+    if (consent) close()
+    else save(false)
+  }, [close, consent, save])
 
   return (
     <ConsentContext.Provider value={{ consent, openPanel }}>
@@ -61,6 +71,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
           onConfigure={() => setConfiguring(true)}
           onMaps={setMaps}
           onBack={() => setConfiguring(false)}
+          onEscape={onEscape}
           onSave={save}
         />
       ) : null}
@@ -74,6 +85,7 @@ function CookieDialog({
   onConfigure,
   onMaps,
   onBack,
+  onEscape,
   onSave,
 }: {
   configuring: boolean
@@ -81,6 +93,7 @@ function CookieDialog({
   onConfigure: () => void
   onMaps: (value: boolean) => void
   onBack: () => void
+  onEscape: () => void
   onSave: (allowMaps: boolean) => void
 }) {
   const titleId = useId()
@@ -95,7 +108,7 @@ function CookieDialog({
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
-        onSave(false)
+        onEscape()
         return
       }
       if (event.key !== 'Tab' || !dialog) return
@@ -119,7 +132,7 @@ function CookieDialog({
       document.removeEventListener('keydown', onKey)
       previous?.focus()
     }
-  }, [onSave, configuring])
+  }, [onEscape, configuring])
 
   return (
     <div
