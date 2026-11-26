@@ -210,21 +210,25 @@ function readPublishedCached() {
 export async function loadPublishedPosts() {
   if (!databaseReady()) return localPosts
   try {
-    const posts = await readPublishedCached()
-    return posts.length ? posts : localPosts
+    return await readPublishedCached()
   } catch {
-    return localPosts
+    // La base está configurada: un fallo o una lista vacía no resucitan el volcado.
+    return []
   }
 }
 
-/** Slugs publicados en la base. `null` si no se ha podido consultar. */
+/**
+ * Slugs publicados en la base.
+ * `null` solo si no hay base: entonces la web usa el volcado local.
+ * Un conjunto vacío significa que el panel no tiene nada publicado ahora.
+ */
 export async function cmsPublishedSlugs(): Promise<Set<string> | null> {
   if (!databaseReady()) return null
   try {
     const posts = await readPublishedCached()
     return new Set(posts.map((post) => post.slug))
   } catch {
-    return null
+    return new Set()
   }
 }
 

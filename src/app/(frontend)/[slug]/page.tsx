@@ -55,7 +55,7 @@ async function resolvePublicPost(slug: string): Promise<Post | undefined> {
   if (isEnabled && fromList) return fromList
 
   const published = await cmsPublishedSlugs()
-  if (published && published.size > 0) return published.has(slug) ? fromList : undefined
+  if (published) return published.has(slug) ? fromList : undefined
   return fromList || findPost(slug)
 }
 
