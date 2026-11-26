@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CONSENT_MAX_AGE_MS, CONSENT_VERSION, parseConsent } from '@/lib/consent'
 import { validarMensaje } from '@/lib/mensaje'
-import { safePreviewPath } from '@/lib/previewPath'
+import { previewOrigin, safePreviewPath } from '@/lib/previewPath'
 
 describe('consentimiento', () => {
   const now = Date.parse('2026-11-26T12:00:00Z')
@@ -28,6 +28,18 @@ describe('ruta de vista previa', () => {
     expect(safePreviewPath('/%5Cevil.com')).toBe('/')
     expect(safePreviewPath('/%2F%2Fevil.com')).toBe('/')
     expect(safePreviewPath('/admin')).toBe('/')
+  })
+
+  it('usa HTTPS cuando el panel no indica el protocolo y no es local', () => {
+    const headers = (values: Record<string, string>) => ({
+      get: (name: string) => values[name] ?? null,
+    })
+    expect(previewOrigin(headers({ host: 'ces.vercel.app' }))).toBe('https://ces.vercel.app')
+    expect(previewOrigin(headers({ host: 'ces.vercel.app', 'x-forwarded-proto': 'https,http' }))).toBe(
+      'https://ces.vercel.app',
+    )
+    expect(previewOrigin(headers({ host: 'localhost:3001' }))).toBe('http://localhost:3001')
+    expect(previewOrigin(headers({}), 'https://www.ceslarioja.org')).toBe('https://www.ceslarioja.org')
   })
 })
 
