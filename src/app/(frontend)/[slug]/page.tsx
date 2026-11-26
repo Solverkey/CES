@@ -47,10 +47,22 @@ export async function generateStaticParams() {
   return items.map((post) => ({ slug: post.slug }))
 }
 
+/** Si el panel ya publica, una ficha retirada no reaparece desde el volcado local. */
+async function resolvePublicPost(slug: string): Promise<Post | undefined> {
+  const { isEnabled } = await draftMode()
+  const loaded = await loadPosts()
+  const fromList = loaded.find((item) => item.slug === slug)
+  if (isEnabled && fromList) return fromList
+
+  const published = await cmsPublishedSlugs()
+  if (published && published.size > 0) return published.has(slug) ? fromList : undefined
+  return fromList || findPost(slug)
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const post = (await loadPosts()).find((item) => item.slug === slug) || findPost(slug)
-  if (!post) return { title: 'Publicación' }
+  const post = await resolvePublicPost(slug)
+  if (!post) return { title: 'Publicación', robots: { index: false, follow: false } }
   const title = post.seoTitle || post.title
   const description = post.seoDescription || post.excerpt || post.title
   const image = post.seoImage || post.image || '/brand/logo.png'
@@ -76,15 +88,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const { isEnabled } = await draftMode()
   const loaded = await loadPosts()
-  const fromList = loaded.find((item) => item.slug === slug)
-  if (!isEnabled || !fromList) {
-    const published = await cmsPublishedSlugs()
-    // Con la base vacía la web sigue sirviendo el volcado local: una redirección no debe taparlo.
-    if (published && published.size > 0 && !published.has(slug)) await applyRedirect(`/${slug}`)
-  }
-  const post = fromList || findPost(slug)
+  const post = await resolvePublicPost(slug)
   if (!post) {
     await applyRedirect(`/${slug}`)
     notFound()
