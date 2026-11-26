@@ -1,76 +1,9 @@
-'use client'
-
-import Link from 'next/link'
-import { useState } from 'react'
+import { ContactForm } from '@/components/ContactForm'
+import { MapEmbed } from '@/components/Cookies'
 
 export function ContactBlock({ showMap = true, page = false }: { showMap?: boolean; page?: boolean }) {
-  const [sent, setSent] = useState(false)
-
-  const form = sent ? (
-    <p className="thanks">Gracias por escribirnos. Te responderemos lo antes posible.</p>
-  ) : (
-    <form
-      className="form"
-      onSubmit={(event) => {
-        event.preventDefault()
-        setSent(true)
-      }}
-    >
-      <div className="form-row">
-        <label>
-          <span>
-            Nombre <i className="req">*</i>
-          </span>
-          <input name="nombre" required autoComplete="given-name" />
-        </label>
-        <label>
-          <span>
-            Apellidos {page ? <i className="req">*</i> : null}
-          </span>
-          <input name="apellidos" required={page} autoComplete="family-name" />
-        </label>
-      </div>
-      <div className="form-row">
-        <label>
-          <span>
-            Correo <i className="req">*</i>
-          </span>
-          <input name="correo" type="email" required autoComplete="email" />
-        </label>
-        <label>
-          <span>
-            Teléfono {page ? <i className="req">*</i> : null}
-          </span>
-          <input name="telefono" type="tel" required={page} autoComplete="tel" />
-        </label>
-      </div>
-      <label>
-        <span>
-          Mensaje <i className="req">*</i>
-        </span>
-        <textarea name="mensaje" required rows={6} />
-      </label>
-      <label className="check">
-        <input name="privacidad" type="checkbox" required />
-        <span>
-          Haciendo click aquí, usted acepta el tratamiento de sus datos personales según nuestra{' '}
-          <Link href="/politica-de-privacidad">Política de privacidad</Link>.
-        </span>
-      </label>
-      <button className="btn btn-wide" type="submit">
-        Enviar
-      </button>
-    </form>
-  )
-
-  const map = showMap ? (
-    <iframe
-      className="map"
-      title="Mapa de la sede del Consejo Económico y Social de La Rioja"
-      src="https://maps.google.com/maps?q=C%2F%20Vara%20de%20Rey%2042%2C%206%2C%2026002&hl=es&z=15&output=embed"
-      loading="lazy"
-    />
-  ) : null
+  const form = <ContactForm requireDetails={page} />
+  const map = showMap ? <MapEmbed /> : null
 
   if (page) {
     return (

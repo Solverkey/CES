@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated, publishedOrAuthenticated } from '../access'
 import { cuerpoField } from '../fields/cuerpo'
+import { contentPreview, contentVersions } from '../fields/publishing'
 import { slugField } from '../fields/slug'
 import { revalidateDelete, revalidateDoc } from '../hooks/revalidate'
 
@@ -12,6 +13,7 @@ export const Actividades: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'organo', 'fechaActo', 'publishedAt', '_status'],
     group: 'Contenido',
+    livePreview: contentPreview,
   },
   defaultSort: '-publishedAt',
   access: {
@@ -20,8 +22,14 @@ export const Actividades: CollectionConfig = {
     update: authenticated,
     delete: authenticated,
   },
-  versions: { drafts: true },
+  versions: contentVersions,
   fields: [
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Contenido',
+          fields: [
     { name: 'title', label: 'Título', type: 'text', required: true },
     {
       type: 'row',
@@ -86,6 +94,10 @@ export const Actividades: CollectionConfig = {
       admin: { description: 'Texto de la tarjeta en los listados. Si se deja vacío, se usa el inicio del contenido.' },
     },
     cuerpoField,
+          ],
+        },
+      ],
+    },
     {
       name: 'publishedAt',
       label: 'Fecha de publicación',

@@ -1,6 +1,11 @@
 import { Archive } from '@/components/Archive'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata = { title: 'Comunicación' }
+export const metadata = pageMeta({
+  title: 'Comunicación',
+  description: 'Notas y comunicaciones del Consejo Económico y Social de La Rioja.',
+  path: '/comunicacion',
+})
 
 export default function ComunicacionPage({
   searchParams,

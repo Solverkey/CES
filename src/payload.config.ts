@@ -1,6 +1,7 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { seoPlugin } from '@payloadcms/plugin-seo'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { es } from '@payloadcms/translations/languages/es'
@@ -12,9 +13,12 @@ import { Comisiones } from './collections/Comisiones'
 import { Dictamenes } from './collections/Dictamenes'
 import { Documentos } from './collections/Documentos'
 import { Imagenes } from './collections/Imagenes'
+import { Mensajes } from './collections/Mensajes'
 import { Noticias } from './collections/Noticias'
 import { Organizaciones } from './collections/Organizaciones'
 import { Users } from './collections/Users'
+import { editor } from './fields/editor'
+import { mcpAccess } from './mcp/access'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -46,9 +50,10 @@ export default buildConfig({
     Imagenes,
     Comisiones,
     Organizaciones,
+    Mensajes,
     Users,
   ],
-  editor: lexicalEditor(),
+  editor,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({
@@ -63,13 +68,65 @@ export default buildConfig({
     },
   }),
   sharp,
+  jobs: {
+    access: {
+      run: ({ req }) => {
+        if (req.user) return true
+        const secret = process.env.CRON_SECRET
+        return Boolean(secret && req.headers.get('authorization') === `Bearer ${secret}`)
+      },
+    },
+    autoRun: [{ cron: '*/5 * * * *', queue: 'default' }],
+  },
   plugins: [
+    seoPlugin({
+      collections: ['dictamenes', 'actividades', 'noticias'],
+      uploadsCollection: 'imagenes',
+      tabbedUI: true,
+      generateTitle: ({ doc }) => {
+        const title = typeof doc?.title === 'string' && doc.title ? doc.title : 'CES La Rioja'
+        return `${title} · CES La Rioja`
+      },
+      generateDescription: ({ doc }) => {
+        const text = doc?.extracto || doc?.resumen
+        return typeof text === 'string' ? text.slice(0, 160) : ''
+      },
+      generateURL: ({ doc }) => {
+        const slug = typeof doc?.slug === 'string' ? doc.slug : ''
+        const base = (process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/$/, '')
+        return slug ? `${base}/${slug}` : base
+      },
+    }),
     redirectsPlugin({
       collections: ['dictamenes', 'actividades', 'noticias'],
+      redirectTypes: ['301', '302'],
       overrides: {
         labels: { singular: 'Redirección', plural: 'Redirecciones' },
         admin: { group: 'Ajustes' },
       },
+    }),
+    mcpPlugin({
+      userCollection: 'users',
+      collections: {
+        dictamenes: { enabled: true },
+        actividades: { enabled: true },
+        noticias: { enabled: true },
+        imagenes: { enabled: true },
+        documentos: { enabled: true },
+        comisiones: { enabled: true },
+        redirects: { enabled: true },
+      },
+      overrideAuth: async (req) => mcpAccess(req),
+      overrideApiKeyCollection: (collection) => ({
+        ...collection,
+        access: {
+          create: () => false,
+          read: () => false,
+          update: () => false,
+          delete: () => false,
+        },
+        admin: { ...collection.admin, hidden: true },
+      }),
     }),
   ],
 })

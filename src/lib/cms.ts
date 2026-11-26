@@ -1,9 +1,11 @@
 import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
-import { getPayload } from 'payload'
-import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
+import { draftMode, cookies } from 'next/headers'
+import { getPayload, type Payload, type TypedUser } from 'payload'
 
 import config from '@payload-config'
 
+import { currentPostsCacheEpoch, POSTS_TAG } from '@/lib/cacheTags'
 import {
   pages as localPages,
   posts as localPosts,
@@ -29,6 +31,11 @@ type Doc = {
   hora?: string | null
   fechaTexto?: string | null
   comision?: unknown
+  meta?: {
+    title?: string | null
+    description?: string | null
+    image?: unknown
+  } | null
 }
 
 function databaseReady() {
@@ -88,16 +95,26 @@ function relationId(value: unknown) {
   return typeof value === 'number' ? value : null
 }
 
+type Foto = { url: string; alt: string }
+
+function fotoOf(value: unknown, fotos: Map<number, Foto>) {
+  const id = relationId(value)
+  if (id && fotos.has(id)) return fotos.get(id) || null
+  const url = fileUrl(value)
+  return url ? { url, alt: '' } : null
+}
+
 function toPost(
   doc: Doc,
   category: Category,
   categoryLabel: string,
   nombres: Map<number, string>,
-  fotos: Map<number, string>,
+  fotos: Map<number, Foto>,
 ): Post | null {
   if (!doc.slug || !doc.title) return null
   const date = (doc.fecha || doc.fechaActo || doc.publishedAt || '').slice(0, 10)
-  const subida = relationId(doc.imagen)
+  const foto = fotoOf(doc.imagen, fotos)
+  const seoFoto = fotoOf(doc.meta?.image, fotos)
   return {
     slug: doc.slug,
     title: doc.title,
@@ -105,25 +122,34 @@ function toPost(
     category,
     categoryLabel,
     excerpt: doc.extracto || doc.resumen || '',
-    image: (subida ? fotos.get(subida) : '') || fileUrl(doc.imagen) || doc.imagenUrl || null,
+    image: foto?.url || doc.imagenUrl || null,
+    imageAlt: foto?.alt || '',
     pdf: fileUrl(doc.pdf) || doc.archivoUrl || null,
     lugar: doc.lugar || '',
     fechaTexto: '',
     hora: doc.hora || '',
     comision: comisionName(doc.comision, nombres),
     html: cuerpoHtml(doc.cuerpo),
+    seoTitle: doc.meta?.title || '',
+    seoDescription: doc.meta?.description || '',
+    seoImage: seoFoto?.url || null,
   }
 }
 
-async function loadPostsFromDatabase(): Promise<Post[]> {
+async function loadPostsFromDatabase(options?: { draft?: boolean; user?: TypedUser | null }): Promise<Post[]> {
   const payload = await payloadOrNull()
-  if (!payload) return localPosts
+  if (!payload) throw new Error('CMS no disponible')
+  return readPosts(payload, options)
+}
 
+async function readPosts(payload: Payload, options?: { draft?: boolean; user?: TypedUser | null }): Promise<Post[]> {
+  const draft = Boolean(options?.draft && options.user)
   const published = { _status: { equals: 'published' } }
+  const access = draft ? { draft: true, overrideAccess: false, user: options?.user || undefined } : { where: published }
   const [dictamenes, actividades, noticias, comisiones] = await Promise.all([
-    payload.find({ collection: 'dictamenes', where: published, limit: 500, depth: 0, sort: '-fecha', pagination: false }),
-    payload.find({ collection: 'actividades', where: published, limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
-    payload.find({ collection: 'noticias', where: published, limit: 200, depth: 0, sort: '-publishedAt', pagination: false }),
+    payload.find({ collection: 'dictamenes', limit: 500, depth: 0, sort: '-fecha', pagination: false, ...access }),
+    payload.find({ collection: 'actividades', limit: 200, depth: 0, sort: '-publishedAt', pagination: false, ...access }),
+    payload.find({ collection: 'noticias', limit: 200, depth: 0, sort: '-publishedAt', pagination: false, ...access }),
     payload.find({ collection: 'comisiones', limit: 100, depth: 0, pagination: false }),
   ])
 
@@ -132,11 +158,11 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
     if (typeof doc.nombre === 'string') nombres.set(doc.id, doc.nombre)
   }
 
-  const fotoIds = [...actividades.docs, ...noticias.docs].flatMap((doc) => {
-    const id = relationId((doc as Doc).imagen)
-    return id ? [id] : []
+  const fotoIds = [...dictamenes.docs, ...actividades.docs, ...noticias.docs].flatMap((doc) => {
+    const item = doc as Doc
+    return [relationId(item.imagen), relationId(item.meta?.image)].filter((id): id is number => Boolean(id))
   })
-  const fotos = new Map<number, string>()
+  const fotos = new Map<number, Foto>()
   if (fotoIds.length) {
     const imagenes = await payload.find({
       collection: 'imagenes',
@@ -146,7 +172,10 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
       pagination: false,
     })
     for (const doc of imagenes.docs) {
-      if (typeof doc.url === 'string') fotos.set(doc.id, ownFile(doc.url))
+      if (typeof doc.url === 'string') {
+        const alt = 'alt' in doc && typeof doc.alt === 'string' ? doc.alt : ''
+        fotos.set(doc.id, { url: ownFile(doc.url), alt })
+      }
     }
   }
 
@@ -156,24 +185,78 @@ async function loadPostsFromDatabase(): Promise<Post[]> {
     ...noticias.docs.map((doc) => toPost(doc, 'noticias', 'Comunicación', nombres, fotos)),
   ].filter((post): post is Post => Boolean(post))
 
-  if (!items.length) return localPosts
   return items.sort((a, b) => b.date.localeCompare(a.date))
 }
 
-const loadPostsPerRequest = cache(loadPostsFromDatabase)
+const loadPublishedCached = unstable_cache(
+  async (_epoch: number) => {
+    const posts = await loadPostsFromDatabase()
+    // Una lista vacía no se guarda: el seed y la primera publicación tienen que verse sin reiniciar.
+    if (!posts.length) throw new Error('CMS sin publicaciones')
+    return posts
+  },
+  ['ces-posts'],
+  { tags: [POSTS_TAG], revalidate: 60 },
+)
 
-/** En producción (y en el build) todas las fichas comparten una sola lectura. */
-let postsPromise: Promise<Post[]> | undefined
+function readPublishedCached() {
+  return loadPublishedCached(currentPostsCacheEpoch())
+}
 
-export function loadPosts(): Promise<Post[]> {
-  if (process.env.NODE_ENV === 'production') {
-    postsPromise ??= loadPostsFromDatabase().catch((error) => {
-      postsPromise = undefined
-      throw error
-    })
-    return postsPromise
+/**
+ * Fichas publicadas. La etiqueta `posts` se invalida al publicar.
+ * Un fallo o una base vacía no se guardan: la siguiente visita vuelve a preguntar.
+ */
+export async function loadPublishedPosts() {
+  if (!databaseReady()) return localPosts
+  try {
+    return await readPublishedCached()
+  } catch {
+    // La base está configurada: un fallo o una lista vacía no resucitan el volcado.
+    return []
   }
-  return loadPostsPerRequest()
+}
+
+/**
+ * Slugs publicados en la base.
+ * `null` solo si no hay base: entonces la web usa el volcado local.
+ * Un conjunto vacío significa que el panel no tiene nada publicado ahora.
+ */
+export async function cmsPublishedSlugs(): Promise<Set<string> | null> {
+  if (!databaseReady()) return null
+  try {
+    const posts = await readPublishedCached()
+    return new Set(posts.map((post) => post.slug))
+  } catch {
+    return new Set()
+  }
+}
+
+async function editorFromCookies() {
+  const payload = await payloadOrNull()
+  if (!payload) return null
+  const token = (await cookies()).get('payload-token')?.value
+  if (!token) return null
+  try {
+    const { user } = await payload.auth({ headers: new Headers({ Authorization: `JWT ${token}` }) })
+    return user
+  } catch {
+    return null
+  }
+}
+
+/** En una vista previa con sesión, incluye borradores. En la web pública, solo lo publicado. */
+export async function loadPosts() {
+  const { isEnabled } = await draftMode()
+  if (!isEnabled) return loadPublishedPosts()
+  const user = await editorFromCookies()
+  if (!user) return loadPublishedPosts()
+  try {
+    const drafts = await loadPostsFromDatabase({ draft: true, user })
+    return drafts.length ? drafts : loadPublishedPosts()
+  } catch {
+    return loadPublishedPosts()
+  }
 }
 
 export async function loadPost(slug: string) {

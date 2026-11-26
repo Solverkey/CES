@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
   blocks: {};
   collections: {
@@ -74,9 +75,12 @@ export interface Config {
     imagenes: Imagene;
     comisiones: Comisione;
     organizaciones: Organizacione;
+    mensajes: Mensaje;
     users: User;
     redirects: Redirect;
+    'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -90,9 +94,12 @@ export interface Config {
     imagenes: ImagenesSelect<false> | ImagenesSelect<true>;
     comisiones: ComisionesSelect<false> | ComisionesSelect<true>;
     organizaciones: OrganizacionesSelect<false> | OrganizacionesSelect<true>;
+    mensajes: MensajesSelect<false> | MensajesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -107,13 +114,37 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | PayloadMcpApiKey;
   jobs: {
-    tasks: unknown;
+    tasks: {
+      schedulePublish: TaskSchedulePublish;
+      inline: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface PayloadMcpApiKeyAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -177,6 +208,14 @@ export interface Dictamene {
    */
   pdf?: (number | null) | Documento;
   archivoUrl?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Imagene;
+  };
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
@@ -227,6 +266,27 @@ export interface Documento {
   focalY?: number | null;
 }
 /**
+ * Las fotos que se pueden elegir en actividades y comunicación.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "imagenes".
+ */
+export interface Imagene {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -235,6 +295,10 @@ export interface User {
   nombre: string;
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  hasAPIKey?: boolean | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -289,6 +353,14 @@ export interface Actividade {
     };
     [k: string]: unknown;
   } | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Imagene;
+  };
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
@@ -298,26 +370,6 @@ export interface Actividade {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * Las fotos que se pueden elegir en actividades y comunicación.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "imagenes".
- */
-export interface Imagene {
-  id: number;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -350,6 +402,14 @@ export interface Noticia {
     };
     [k: string]: unknown;
   } | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Imagene;
+  };
   publishedAt?: string | null;
   autor?: (number | null) | User;
   /**
@@ -377,6 +437,20 @@ export interface Organizacione {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mensajes".
+ */
+export interface Mensaje {
+  id: number;
+  nombre: string;
+  apellidos?: string | null;
+  correo: string;
+  telefono?: string | null;
+  mensaje: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -399,8 +473,163 @@ export interface Redirect {
         } | null);
     url?: string | null;
   };
+  type: '301' | '302';
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * API keys control which collections, resources, tools, and prompts MCP clients can access
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: number;
+  /**
+   * The user that the API key is associated with.
+   */
+  user: number | User;
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null;
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null;
+  dictamenes?: {
+    /**
+     * Allow clients to find dictamenes.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create dictamenes.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update dictamenes.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete dictamenes.
+     */
+    delete?: boolean | null;
+  };
+  actividades?: {
+    /**
+     * Allow clients to find actividades.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create actividades.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update actividades.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete actividades.
+     */
+    delete?: boolean | null;
+  };
+  noticias?: {
+    /**
+     * Allow clients to find noticias.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create noticias.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update noticias.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete noticias.
+     */
+    delete?: boolean | null;
+  };
+  imagenes?: {
+    /**
+     * Allow clients to find imagenes.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create imagenes.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update imagenes.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete imagenes.
+     */
+    delete?: boolean | null;
+  };
+  documentos?: {
+    /**
+     * Allow clients to find documentos.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create documentos.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update documentos.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete documentos.
+     */
+    delete?: boolean | null;
+  };
+  comisiones?: {
+    /**
+     * Allow clients to find comisiones.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create comisiones.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update comisiones.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete comisiones.
+     */
+    delete?: boolean | null;
+  };
+  redirects?: {
+    /**
+     * Allow clients to find redirects.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create redirects.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update redirects.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete redirects.
+     */
+    delete?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  hasAPIKey?: boolean | null;
+  collection: 'payload-mcp-api-keys';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -418,6 +647,98 @@ export interface PayloadKv {
     | number
     | boolean
     | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null;
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'schedulePublish';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  taskSlug?: ('inline' | 'schedulePublish') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -455,18 +776,31 @@ export interface PayloadLockedDocument {
         value: number | Organizacione;
       } | null)
     | ({
+        relationTo: 'mensajes';
+        value: number | Mensaje;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null)
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -476,10 +810,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   key?: string | null;
   value?:
     | {
@@ -519,6 +858,13 @@ export interface DictamenesSelect<T extends boolean = true> {
   cuerpo?: T;
   pdf?: T;
   archivoUrl?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   publishedAt?: T;
   autor?: T;
   slug?: T;
@@ -541,6 +887,13 @@ export interface ActividadesSelect<T extends boolean = true> {
   imagenUrl?: T;
   extracto?: T;
   cuerpo?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   publishedAt?: T;
   autor?: T;
   slug?: T;
@@ -558,6 +911,13 @@ export interface NoticiasSelect<T extends boolean = true> {
   imagenUrl?: T;
   extracto?: T;
   cuerpo?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   publishedAt?: T;
   autor?: T;
   slug?: T;
@@ -587,6 +947,7 @@ export interface DocumentosSelect<T extends boolean = true> {
  * via the `definition` "imagenes_select".
  */
 export interface ImagenesSelect<T extends boolean = true> {
+  alt?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -632,12 +993,29 @@ export interface OrganizacionesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mensajes_select".
+ */
+export interface MensajesSelect<T extends boolean = true> {
+  nombre?: T;
+  apellidos?: T;
+  correo?: T;
+  telefono?: T;
+  mensaje?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
   nombre?: T;
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  hasAPIKey?: T;
   email?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
@@ -667,8 +1045,80 @@ export interface RedirectsSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
       };
+  type?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T;
+  label?: T;
+  description?: T;
+  dictamenes?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  actividades?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  noticias?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  imagenes?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  documentos?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  comisiones?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  redirects?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  hasAPIKey?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -677,6 +1127,37 @@ export interface RedirectsSelect<T extends boolean = true> {
 export interface PayloadKvSelect<T extends boolean = true> {
   key?: T;
   data?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -719,6 +1200,40 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSchedulePublish".
+ */
+export interface TaskSchedulePublish {
+  input: {
+    type?: ('publish' | 'unpublish') | null;
+    locale?: string | null;
+    doc?:
+      | ({
+          relationTo: 'dictamenes';
+          value: number | Dictamene;
+        } | null)
+      | ({
+          relationTo: 'actividades';
+          value: number | Actividade;
+        } | null)
+      | ({
+          relationTo: 'noticias';
+          value: number | Noticia;
+        } | null);
+    global?: string | null;
+    user?:
+      | ({
+          relationTo: 'users';
+          value: number | User;
+        } | null)
+      | ({
+          relationTo: 'payload-mcp-api-keys';
+          value: number | PayloadMcpApiKey;
+        } | null);
+  };
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

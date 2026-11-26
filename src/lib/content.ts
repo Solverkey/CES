@@ -17,6 +17,10 @@ export type Post = {
   hora: string
   comision: string
   html: string
+  seoTitle?: string
+  seoDescription?: string
+  seoImage?: string | null
+  imageAlt?: string
 }
 
 export type PageContent = {
