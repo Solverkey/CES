@@ -188,11 +188,20 @@ async function readPosts(payload: Payload, options?: { draft?: boolean; user?: T
   return items.sort((a, b) => b.date.localeCompare(a.date))
 }
 
-const loadPublishedCached = unstable_cache(() => loadPostsFromDatabase(), ['ces-posts'], { tags: [POSTS_TAG] })
+const loadPublishedCached = unstable_cache(
+  async () => {
+    const posts = await loadPostsFromDatabase()
+    // Una lista vacía no se guarda: el seed y la primera publicación tienen que verse sin reiniciar.
+    if (!posts.length) throw new Error('CMS sin publicaciones')
+    return posts
+  },
+  ['ces-posts'],
+  { tags: [POSTS_TAG] },
+)
 
 /**
  * Fichas publicadas. La etiqueta `posts` se invalida al publicar.
- * Un fallo de lectura no se guarda: la siguiente visita vuelve a preguntar a la base.
+ * Un fallo o una base vacía no se guardan: la siguiente visita vuelve a preguntar.
  */
 export async function loadPublishedPosts() {
   if (!databaseReady()) return localPosts
