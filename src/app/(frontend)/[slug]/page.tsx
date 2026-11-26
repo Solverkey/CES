@@ -81,10 +81,14 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const fromList = loaded.find((item) => item.slug === slug)
   if (!isEnabled || !fromList) {
     const published = await cmsPublishedSlugs()
-    if (published && !published.has(slug)) await applyRedirect(`/${slug}`)
+    // Con la base vacía la web sigue sirviendo el volcado local: una redirección no debe taparlo.
+    if (published && published.size > 0 && !published.has(slug)) await applyRedirect(`/${slug}`)
   }
   const post = fromList || findPost(slug)
-  if (!post) notFound()
+  if (!post) {
+    await applyRedirect(`/${slug}`)
+    notFound()
+  }
 
   const siblings = loaded.filter((item) => item.category === post.category)
   const index = siblings.findIndex((item) => item.slug === post.slug)

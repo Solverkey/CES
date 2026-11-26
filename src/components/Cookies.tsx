@@ -103,7 +103,11 @@ function CookieDialog({
   useEffect(() => {
     const dialog = dialogRef.current
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null
-    dialog?.focus()
+    const focusable = () =>
+      dialog
+        ? [...dialog.querySelectorAll<HTMLElement>('a[href], button, input')].filter((node) => !node.hasAttribute('disabled'))
+        : []
+    focusable()[0]?.focus()
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -112,16 +116,16 @@ function CookieDialog({
         return
       }
       if (event.key !== 'Tab' || !dialog) return
-      const focusable = [...dialog.querySelectorAll<HTMLElement>('a[href], button, input, [tabindex]:not([tabindex="-1"])')].filter(
-        (node) => !node.hasAttribute('disabled'),
-      )
-      if (!focusable.length) return
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
+      const nodes = focusable()
+      if (!nodes.length) return
+      const first = nodes[0]
+      const last = nodes[nodes.length - 1]
+      const active = document.activeElement
+      const inside = active instanceof Node && dialog.contains(active)
+      if (event.shiftKey && (!inside || active === first)) {
         event.preventDefault()
         last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && (!inside || active === last)) {
         event.preventDefault()
         first.focus()
       }
@@ -132,7 +136,13 @@ function CookieDialog({
       document.removeEventListener('keydown', onKey)
       previous?.focus()
     }
-  }, [onEscape, configuring])
+  }, [onEscape])
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    dialog.querySelector<HTMLElement>('a[href], button, input:not([disabled])')?.focus()
+  }, [configuring])
 
   return (
     <div
@@ -142,7 +152,6 @@ function CookieDialog({
       aria-modal="true"
       aria-labelledby={titleId}
       aria-describedby={descId}
-      tabIndex={-1}
     >
       <div>
         <h2 id={titleId}>Cookies</h2>
