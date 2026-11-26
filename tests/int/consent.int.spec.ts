@@ -28,6 +28,10 @@ describe('ruta de vista previa', () => {
     expect(safePreviewPath('/%5Cevil.com')).toBe('/')
     expect(safePreviewPath('/%2F%2Fevil.com')).toBe('/')
     expect(safePreviewPath('/admin')).toBe('/')
+    expect(safePreviewPath('/admin/login')).toBe('/')
+    expect(safePreviewPath('/api/users')).toBe('/')
+    expect(safePreviewPath('/administracion')).toBe('/administracion')
+    expect(safePreviewPath('/apicultura')).toBe('/apicultura')
   })
 
   it('usa HTTPS cuando el panel no indica el protocolo y no es local', () => {

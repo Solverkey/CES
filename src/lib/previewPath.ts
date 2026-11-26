@@ -22,7 +22,7 @@ export function safePreviewPath(raw: string) {
   }
   path = path.replace(/\\/g, '/')
   if (!path.startsWith('/') || path.startsWith('//') || path.includes('..')) return '/'
-  if (path.startsWith('/admin') || path.startsWith('/api')) return '/'
+  if (/^\/(admin|api)(\/|$)/.test(path)) return '/'
   if (/[\u0000-\u001f\u007f]/.test(path)) return '/'
   return path
 }
