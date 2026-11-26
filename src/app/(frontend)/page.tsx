@@ -5,6 +5,11 @@ import { PostGrid } from '@/components/PostCard'
 import { SearchBar } from '@/components/SearchBar'
 import { loadPosts } from '@/lib/cms'
 
+export const metadata = {
+  alternates: { canonical: '/' },
+  openGraph: { url: '/' },
+}
+
 export default async function HomePage() {
   const latest = (await loadPosts()).slice(0, 6)
   return (

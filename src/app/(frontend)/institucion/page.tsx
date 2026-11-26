@@ -1,6 +1,11 @@
 import { RichPage } from '@/components/RichPage'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata = { title: 'Institución' }
+export const metadata = pageMeta({
+  title: 'Institución',
+  description: 'Naturaleza, composición y funciones del Consejo Económico y Social de La Rioja.',
+  path: '/institucion',
+})
 
 export default function InstitucionPage() {
   return (

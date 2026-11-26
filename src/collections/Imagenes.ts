@@ -22,5 +22,23 @@ export const Imagenes: CollectionConfig = {
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
     staticDir: path.resolve(dirname, '../../media/imagenes'),
   },
-  fields: [],
+  fields: [
+    {
+      name: 'alt',
+      label: 'Texto alternativo',
+      type: 'text',
+      required: true,
+      hooks: {
+        beforeValidate: [
+          ({ value, data, req }) => {
+            if (typeof value === 'string' && value.trim()) return value.trim()
+            const filename =
+              (data && typeof data.filename === 'string' && data.filename) || req.file?.name || ''
+            const fromName = filename.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim()
+            return fromName || 'Fotografía'
+          },
+        ],
+      },
+    },
+  ],
 }

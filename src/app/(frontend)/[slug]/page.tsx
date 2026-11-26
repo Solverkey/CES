@@ -1,8 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { loadPosts } from '@/lib/cms'
-import { findPost, posts, type Post } from '@/lib/content'
+import { JsonLd } from '@/components/JsonLd'
+import { loadPosts, loadPublishedPosts } from '@/lib/cms'
+import { findPost, type Post } from '@/lib/content'
+import { applyRedirect } from '@/lib/redirects'
+import { absoluteUrl } from '@/lib/site'
 
 const MESES = [
   'enero',
@@ -28,28 +32,55 @@ function heroDate(iso: string) {
 
 /** La foto va debajo del texto, justo antes de la fecha corta, como en la web. */
 function bodyHtml(post: Post) {
-  if (!post.image || /<img\b/i.test(post.html)) return post.html
-  const photo = `<img src="${post.image.replace(/"/g, '')}" alt="">`
+  const alt = (post.imageAlt || post.title).replace(/"/g, '')
+  const html = post.html.replace(/\salt=(["'])\s*\1/gi, ` alt="${alt}"`)
+  if (!post.image || /<img\b/i.test(html)) return html
+  const photo = `<img src="${post.image.replace(/"/g, '')}" alt="${alt}">`
   const dated = post.html.match(/^(.*)(<p>\s*\d{2}\/\d{2}\/\d{4}\s*<\/p>)\s*$/s)
   if (dated) return `${dated[1]}${photo}${dated[2]}`
   return `${post.html}${photo}`
 }
 
-export function generateStaticParams() {
-  return posts.map((post) => ({ slug: post.slug }))
+export async function generateStaticParams() {
+  const items = await loadPublishedPosts()
+  return items.map((post) => ({ slug: post.slug }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const post = (await loadPosts()).find((item) => item.slug === slug) || findPost(slug)
-  return { title: post?.title || 'Publicación' }
+  if (!post) return { title: 'Publicación' }
+  const title = post.seoTitle || post.title
+  const description = post.seoDescription || post.excerpt || post.title
+  const image = post.seoImage || post.image || '/brand/logo.png'
+  return {
+    title: post.seoTitle ? { absolute: post.seoTitle } : post.title,
+    description,
+    alternates: { canonical: `/${post.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/${post.slug}`,
+      type: 'article',
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
+  }
 }
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const loaded = await loadPosts()
   const post = loaded.find((item) => item.slug === slug) || findPost(slug)
-  if (!post) notFound()
+  if (!post) {
+    await applyRedirect(`/${slug}`)
+    notFound()
+  }
 
   const siblings = loaded.filter((item) => item.category === post.category)
   const index = siblings.findIndex((item) => item.slug === post.slug)
@@ -57,8 +88,24 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const older = index >= 0 ? siblings[index + 1] : undefined
   const showPdf = Boolean(post.pdf && !post.html.includes(post.pdf))
 
+  const image = post.seoImage || post.image
+  const article = {
+    '@context': 'https://schema.org',
+    '@type': post.category === 'noticias' ? 'NewsArticle' : 'Article',
+    headline: post.title,
+    datePublished: post.date || undefined,
+    description: post.seoDescription || post.excerpt || undefined,
+    image: image ? absoluteUrl(image) : undefined,
+    mainEntityOfPage: absoluteUrl(`/${post.slug}`),
+    publisher: {
+      '@type': 'GovernmentOrganization',
+      name: 'Consejo Económico y Social de La Rioja',
+    },
+  }
+
   return (
     <article className="post">
+      <JsonLd data={article} />
       <header
         className="post-hero"
         style={post.image ? { backgroundImage: `url(${post.image})` } : undefined}

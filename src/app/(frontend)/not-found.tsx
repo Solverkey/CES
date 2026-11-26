@@ -1,6 +1,12 @@
+import { headers } from 'next/headers'
 import Link from 'next/link'
 
-export default function NotFound() {
+import { applyRedirect } from '@/lib/redirects'
+
+export default async function NotFound() {
+  const pathname = (await headers()).get('x-pathname') || ''
+  if (pathname) await applyRedirect(pathname)
+
   return (
     <div className="page-head">
       <div className="container">

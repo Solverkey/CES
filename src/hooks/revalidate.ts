@@ -1,5 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache.js'
+
+import { POSTS_TAG } from '../lib/cacheTags'
 
 /**
  * Tras guardar en el panel, refresca las páginas de Next afectadas.
@@ -14,6 +16,7 @@ export const revalidateDoc =
     if (previousDoc?.slug && previousDoc.slug !== doc?.slug) paths.add(`/${previousDoc.slug}`)
     if (listingPath) paths.add(listingPath)
     for (const p of paths) safeRevalidate(p)
+    safeRevalidateTag()
     return doc
   }
 
@@ -24,6 +27,7 @@ export const revalidateDelete =
     safeRevalidate('/')
     if (doc?.slug) safeRevalidate(`/${doc.slug}`)
     if (listingPath) safeRevalidate(listingPath)
+    safeRevalidateTag()
     return doc
   }
 
@@ -40,6 +44,14 @@ export const revalidateGlobal =
     }
     return doc
   }
+
+function safeRevalidateTag() {
+  try {
+    revalidateTag(POSTS_TAG, 'max')
+  } catch {
+    /* fuera de Next (scripts, CLI) no hay nada que revalidar */
+  }
+}
 
 function safeRevalidate(path: string) {
   try {

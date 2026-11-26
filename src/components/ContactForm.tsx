@@ -1,23 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useActionState } from 'react'
 
-export function ContactForm() {
-  const [sent, setSent] = useState(false)
+import { enviarMensaje, type MensajeState } from '@/app/(frontend)/contacto/actions'
 
-  if (sent) {
+const initial: MensajeState = null
+
+export function ContactForm({ requireDetails = true }: { requireDetails?: boolean }) {
+  const [state, action, pending] = useActionState(enviarMensaje, initial)
+
+  if (state?.ok) {
     return <p className="thanks">Gracias por escribirnos. Te responderemos lo antes posible.</p>
   }
 
   return (
-    <form
-      className="form"
-      onSubmit={(event) => {
-        event.preventDefault()
-        setSent(true)
-      }}
-    >
+    <form className="form" action={action}>
+      {requireDetails ? <input type="hidden" name="completo" value="1" /> : null}
       <div className="form-row">
         <label>
           <span>
@@ -27,9 +26,9 @@ export function ContactForm() {
         </label>
         <label>
           <span>
-            Apellidos <i className="req">*</i>
+            Apellidos {requireDetails ? <i className="req">*</i> : null}
           </span>
-          <input name="apellidos" required autoComplete="family-name" />
+          <input name="apellidos" required={requireDetails} autoComplete="family-name" />
         </label>
       </div>
       <div className="form-row">
@@ -41,9 +40,9 @@ export function ContactForm() {
         </label>
         <label>
           <span>
-            Teléfono <i className="req">*</i>
+            Teléfono {requireDetails ? <i className="req">*</i> : null}
           </span>
-          <input name="telefono" type="tel" required autoComplete="tel" />
+          <input name="telefono" type="tel" required={requireDetails} autoComplete="tel" />
         </label>
       </div>
       <label>
@@ -59,8 +58,13 @@ export function ContactForm() {
           <Link href="/politica-de-privacidad">Política de privacidad</Link>.
         </span>
       </label>
-      <button className="btn btn-wide" type="submit">
-        Enviar
+      {state && !state.ok ? (
+        <p className="form-error" role="alert">
+          {state.error}
+        </p>
+      ) : null}
+      <button className="btn btn-wide" type="submit" disabled={pending}>
+        {pending ? 'Enviando…' : 'Enviar'}
       </button>
     </form>
   )

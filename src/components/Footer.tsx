@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { ConfigurarCookies } from '@/components/Cookies'
+
 const MENU = [
   ['/institucion', 'Institución'],
   ['/actividades', 'Actividades'],
@@ -44,6 +46,9 @@ export function Footer() {
                 <Link href={href}>{label}</Link>
               </li>
             ))}
+            <li>
+              <ConfigurarCookies />
+            </li>
           </ul>
         </div>
         <div>

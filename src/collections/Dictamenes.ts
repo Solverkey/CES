@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated, publishedOrAuthenticated } from '../access'
 import { cuerpoField } from '../fields/cuerpo'
+import { contentPreview, contentVersions } from '../fields/publishing'
 import { slugField } from '../fields/slug'
 import { revalidateDelete, revalidateDoc } from '../hooks/revalidate'
 
@@ -12,6 +13,7 @@ export const Dictamenes: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['numero', 'anio', 'title', 'fecha', 'comision', '_status'],
     group: 'Contenido',
+    livePreview: contentPreview,
   },
   defaultSort: '-fecha',
   access: {
@@ -20,8 +22,14 @@ export const Dictamenes: CollectionConfig = {
     update: authenticated,
     delete: authenticated,
   },
-  versions: { drafts: true },
+  versions: contentVersions,
   fields: [
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Contenido',
+          fields: [
     { name: 'title', label: 'Título', type: 'text', required: true },
     {
       type: 'row',
@@ -80,6 +88,10 @@ export const Dictamenes: CollectionConfig = {
       admin: { description: 'Súbelo aquí. Es el documento que se abre desde la ficha.' },
     },
     { name: 'archivoUrl', type: 'text', admin: { hidden: true } },
+          ],
+        },
+      ],
+    },
     {
       name: 'publishedAt',
       label: 'Fecha de publicación en la web',

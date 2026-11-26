@@ -3,8 +3,13 @@ import { PostCard } from '@/components/PostCard'
 import { SearchBar } from '@/components/SearchBar'
 import { loadPosts } from '@/lib/cms'
 import { one, pageNumber, paginate, searchPosts } from '@/lib/content'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata = { title: 'Buscar' }
+export const metadata = pageMeta({
+  title: 'Buscar',
+  description: 'Buscador de actividades, dictámenes y notas del Consejo Económico y Social de La Rioja.',
+  path: '/buscar',
+})
 
 export default async function BuscarPage({
   searchParams,
