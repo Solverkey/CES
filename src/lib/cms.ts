@@ -138,13 +138,8 @@ function toPost(
 
 async function loadPostsFromDatabase(options?: { draft?: boolean; user?: TypedUser | null }): Promise<Post[]> {
   const payload = await payloadOrNull()
-  if (!payload) return localPosts
-
-  try {
-    return await readPosts(payload, options)
-  } catch {
-    return localPosts
-  }
+  if (!payload) throw new Error('CMS no disponible')
+  return readPosts(payload, options)
 }
 
 async function readPosts(payload: Payload, options?: { draft?: boolean; user?: TypedUser | null }): Promise<Post[]> {
@@ -196,9 +191,17 @@ async function readPosts(payload: Payload, options?: { draft?: boolean; user?: T
 
 const loadPublishedCached = unstable_cache(() => loadPostsFromDatabase(), ['ces-posts'], { tags: [POSTS_TAG] })
 
-/** Fichas publicadas. La etiqueta `posts` se invalida al guardar en el panel. */
-export function loadPublishedPosts() {
-  return loadPublishedCached()
+/**
+ * Fichas publicadas. La etiqueta `posts` se invalida al publicar.
+ * Un fallo de lectura no se guarda: la siguiente visita vuelve a preguntar a la base.
+ */
+export async function loadPublishedPosts() {
+  if (!databaseReady()) return localPosts
+  try {
+    return await loadPublishedCached()
+  } catch {
+    return localPosts
+  }
 }
 
 async function editorFromCookies() {
@@ -220,7 +223,11 @@ export async function loadPosts() {
   if (!isEnabled) return loadPublishedPosts()
   const user = await editorFromCookies()
   if (!user) return loadPublishedPosts()
-  return loadPostsFromDatabase({ draft: true, user })
+  try {
+    return await loadPostsFromDatabase({ draft: true, user })
+  } catch {
+    return loadPublishedPosts()
+  }
 }
 
 export async function loadPost(slug: string) {

@@ -7,10 +7,18 @@ import { POSTS_TAG } from '../lib/cacheTags'
  * Tras guardar en el panel, refresca las páginas de Next afectadas.
  * `listingPath` es el listado de la colección (p. ej. /dictamenes).
  */
+function affectsPublic(doc?: { _status?: string | null }, previousDoc?: { _status?: string | null }) {
+  const now = doc?._status
+  const before = previousDoc?._status
+  if (!now && !before) return true
+  return now === 'published' || before === 'published'
+}
+
 export const revalidateDoc =
   (listingPath?: string): CollectionAfterChangeHook =>
   ({ doc, previousDoc, req: { context } }) => {
     if (context.disableRevalidate) return doc
+    if (!affectsPublic(doc, previousDoc)) return doc
     const paths = new Set<string>(['/'])
     if (doc?.slug) paths.add(`/${doc.slug}`)
     if (previousDoc?.slug && previousDoc.slug !== doc?.slug) paths.add(`/${previousDoc.slug}`)
@@ -24,6 +32,7 @@ export const revalidateDelete =
   (listingPath?: string): CollectionAfterDeleteHook =>
   ({ doc, req: { context } }) => {
     if (context.disableRevalidate) return doc
+    if (doc?._status && doc._status !== 'published') return doc
     safeRevalidate('/')
     if (doc?.slug) safeRevalidate(`/${doc.slug}`)
     if (listingPath) safeRevalidate(listingPath)

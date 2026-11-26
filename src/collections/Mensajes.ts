@@ -21,21 +21,24 @@ export const Mensajes: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [
-      ({ data, req }) => {
-        if (!req.context.contactoConsentido) {
+      ({ data, operation, originalDoc, req }) => {
+        const source = operation === 'update' ? { ...originalDoc, ...data } : data
+        if (operation === 'update') {
+          if (!req.user) throw new APIError('No autorizado', 403)
+        } else if (!req.context.contactoConsentido) {
           throw new APIError('El mensaje solo se acepta desde el formulario de contacto.', 403)
         }
         const parsed = validarMensaje({
-          nombre: String(data?.nombre || ''),
-          apellidos: String(data?.apellidos || ''),
-          correo: String(data?.correo || ''),
-          telefono: String(data?.telefono || ''),
-          mensaje: String(data?.mensaje || ''),
+          nombre: String(source?.nombre || ''),
+          apellidos: String(source?.apellidos || ''),
+          correo: String(source?.correo || ''),
+          telefono: String(source?.telefono || ''),
+          mensaje: String(source?.mensaje || ''),
           privacidad: true,
           completo: false,
         })
         if (!parsed.ok) throw new APIError(parsed.error, 400)
-        return { ...data, ...parsed.data }
+        return operation === 'update' ? data : { ...data, ...parsed.data }
       },
     ],
   },
