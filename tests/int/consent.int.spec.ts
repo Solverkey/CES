@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
+import { bumpPostsCacheEpoch, currentPostsCacheEpoch } from '@/lib/cacheTags'
 import { CONSENT_MAX_AGE_MS, CONSENT_VERSION, parseConsent } from '@/lib/consent'
 import { validarMensaje } from '@/lib/mensaje'
 import { previewOrigin, safePreviewPath } from '@/lib/previewPath'
+
+describe('caché de publicaciones', () => {
+  it('cambia de época cuando la invalidación de Next no está disponible', () => {
+    const before = currentPostsCacheEpoch()
+    bumpPostsCacheEpoch()
+    expect(currentPostsCacheEpoch()).toBe(before + 1)
+  })
+})
 
 describe('consentimiento', () => {
   const now = Date.parse('2026-11-26T12:00:00Z')

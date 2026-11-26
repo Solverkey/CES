@@ -5,7 +5,7 @@ import { getPayload, type Payload, type TypedUser } from 'payload'
 
 import config from '@payload-config'
 
-import { POSTS_TAG } from '@/lib/cacheTags'
+import { currentPostsCacheEpoch, POSTS_TAG } from '@/lib/cacheTags'
 import {
   pages as localPages,
   posts as localPosts,
@@ -189,15 +189,19 @@ async function readPosts(payload: Payload, options?: { draft?: boolean; user?: T
 }
 
 const loadPublishedCached = unstable_cache(
-  async () => {
+  async (_epoch: number) => {
     const posts = await loadPostsFromDatabase()
     // Una lista vacía no se guarda: el seed y la primera publicación tienen que verse sin reiniciar.
     if (!posts.length) throw new Error('CMS sin publicaciones')
     return posts
   },
   ['ces-posts'],
-  { tags: [POSTS_TAG] },
+  { tags: [POSTS_TAG], revalidate: 60 },
 )
+
+function readPublishedCached() {
+  return loadPublishedCached(currentPostsCacheEpoch())
+}
 
 /**
  * Fichas publicadas. La etiqueta `posts` se invalida al publicar.
@@ -206,7 +210,7 @@ const loadPublishedCached = unstable_cache(
 export async function loadPublishedPosts() {
   if (!databaseReady()) return localPosts
   try {
-    const posts = await loadPublishedCached()
+    const posts = await readPublishedCached()
     return posts.length ? posts : localPosts
   } catch {
     return localPosts
@@ -217,7 +221,7 @@ export async function loadPublishedPosts() {
 export async function cmsPublishedSlugs(): Promise<Set<string> | null> {
   if (!databaseReady()) return null
   try {
-    const posts = await loadPublishedCached()
+    const posts = await readPublishedCached()
     return new Set(posts.map((post) => post.slug))
   } catch {
     return null

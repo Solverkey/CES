@@ -1,7 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload'
 import { revalidatePath, revalidateTag } from 'next/cache.js'
 
-import { POSTS_TAG } from '../lib/cacheTags'
+import { bumpPostsCacheEpoch, POSTS_TAG } from '../lib/cacheTags'
 
 /**
  * Tras guardar en el panel, refresca las páginas de Next afectadas.
@@ -58,7 +58,7 @@ function safeRevalidateTag() {
   try {
     revalidateTag(POSTS_TAG, 'max')
   } catch {
-    /* fuera de Next (scripts, CLI) no hay nada que revalidar */
+    bumpPostsCacheEpoch()
   }
 }
 
